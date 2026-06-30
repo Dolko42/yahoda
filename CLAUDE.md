@@ -2,6 +2,11 @@
 
 > Read this first. Then read `/docs/claude-code-rules.md` before writing any code.
 
+> **Session continuity:** at the start of a session, read the top entry of
+> [`docs/session-log.md`](docs/session-log.md) to catch up on where the last session left
+> off and what's next. At the end of a session, run the **`/handoff`** skill to append a new
+> entry so the next session is prepared.
+
 ## What this project is
 
 **Yahoda** (working name) is a **design system workspace**: a single source of
