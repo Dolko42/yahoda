@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/latest-handoff.mjs",
+            "timeout": 10,
+            "statusMessage": "Loading session handoff"
+          }
+        ]
+      }
+    ]
+  }
+}
