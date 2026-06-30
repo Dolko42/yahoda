@@ -1,0 +1,588 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`golden snapshots > css 1`] = `
+"/*
+ * Yahoda export — CSS variables
+ * system: Acme UI
+ * schemaVersion: 1.0.0
+ * commit: draft
+ */
+:root {
+  /* primitives */
+  --palette-blue-600: #2448B8;
+  --palette-blue-700: #1E3FA0;
+  --palette-red-600: #C0341D;
+  --palette-slate-300: #C4C9D1;
+  --palette-slate-900: #181A1D;
+  --palette-white: #FFFFFF;
+  /* semantic */
+  --color-border: var(--palette-slate-300);
+  --color-danger: var(--palette-red-600);
+  --color-primary: var(--palette-blue-600);
+  --color-primaryHover: var(--palette-blue-700);
+  --color-surface: var(--palette-white);
+  --color-text: var(--palette-slate-900);
+  --color-textOnPrimary: var(--palette-white);
+  --duration-fast: 150ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --radius-lg: 12px;
+  --radius-md: 8px;
+  --radius-sm: 4px;
+  --shadow-md: 0px 6px 16px -4px rgba(24,26,29,0.16);
+  --shadow-sm: 0px 1px 2px 0px rgba(24,26,29,0.08);
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --typography-body-md-font-family: Inter;
+  --typography-body-md-font-size: 1rem;
+  --typography-body-md-line-height: 1.5;
+  --typography-body-md-font-weight: 400;
+  --typography-heading-lg-font-family: Inter;
+  --typography-heading-lg-font-size: 2rem;
+  --typography-heading-lg-line-height: 1.2;
+  --typography-heading-lg-font-weight: 700;
+  --typography-label-sm-font-family: Inter;
+  --typography-label-sm-font-size: 0.875rem;
+  --typography-label-sm-line-height: 1.4;
+  --typography-label-sm-font-weight: 500;
+}
+"
+`;
+
+exports[`golden snapshots > markdown 1`] = `
+"<!--
+Yahoda export — Markdown docs
+system: Acme UI
+schemaVersion: 1.0.0
+commit: draft
+/
+-->
+# Acme UI
+
+Seed/example design system for Yahoda.
+## Tokens
+
+| Token | Tier | Value | Resolved | Usage |
+| --- | --- | --- | --- | --- |
+| \`color.border\` | semantic | → palette.slate.300 | #C4C9D1 | Default border/divider color. |
+| \`color.danger\` | semantic | → palette.red.600 | #C0341D | Destructive/error emphasis. |
+| \`color.primary\` | semantic | → palette.blue.600 | #2448B8 | Primary actions and brand emphasis. |
+| \`color.primaryHover\` | semantic | → palette.blue.700 | #1E3FA0 | Hover/active state of primary surfaces. |
+| \`color.surface\` | semantic | → palette.white | #FFFFFF | Default surface/background for components. |
+| \`color.text\` | semantic | → palette.slate.900 | #181A1D | Default body text color. |
+| \`color.textOnPrimary\` | semantic | → palette.white | #FFFFFF | Text/icon color on primary surfaces. |
+| \`duration.fast\` | semantic | 150ms |  | Hover/press micro-interactions. |
+| \`easing.standard\` | semantic | cubic-bezier(0.2, 0, 0, 1) |  | Default easing for UI transitions. |
+| \`palette.blue.600\` | primitive | #2448B8 |  |  |
+| \`palette.blue.700\` | primitive | #1E3FA0 |  |  |
+| \`palette.red.600\` | primitive | #C0341D |  |  |
+| \`palette.slate.300\` | primitive | #C4C9D1 |  |  |
+| \`palette.slate.900\` | primitive | #181A1D |  |  |
+| \`palette.white\` | primitive | #FFFFFF |  |  |
+| \`radius.lg\` | semantic | 12px |  | Cards, dialogs. |
+| \`radius.md\` | semantic | 8px |  | Buttons, alerts. |
+| \`radius.sm\` | semantic | 4px |  | Inputs, badges, small controls. |
+| \`shadow.md\` | semantic | 1 layer(s) |  |  |
+| \`shadow.sm\` | semantic | 1 layer(s) |  |  |
+| \`spacing.1\` | semantic | 4px |  |  |
+| \`spacing.2\` | semantic | 8px |  |  |
+| \`spacing.3\` | semantic | 12px |  |  |
+| \`spacing.4\` | semantic | 16px |  |  |
+| \`spacing.6\` | semantic | 24px |  |  |
+| \`typography.body.md\` | semantic | Inter 1rem/1.5 400 |  | Default body copy. |
+| \`typography.heading.lg\` | semantic | Inter 2rem/1.2 700 |  | Page and section headings. |
+| \`typography.label.sm\` | semantic | Inter 0.875rem/1.4 500 |  | Form labels and button text. |
+## Components
+### Alert
+
+_Communicate an important, contextual message._
+
+**Status:** published
+
+**Variants:** info, danger
+
+**States:** default
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.surface\` |
+| color | \`color.text\` |
+| borderColor | \`color.border\` |
+| radius | \`radius.md\` |
+| padding | \`spacing.3\` |
+
+**Do:**
+- Use for contextual, in-page messages tied to a task.
+
+**Avoid:**
+- Don't use for transient notifications — use a Toast (later).
+
+**Accessibility (contrast):**
+
+- color.text on color.surface: 17.44:1 AA ✓
+
+### Badge
+
+_Label or annotate with a small status token._
+
+**Status:** published
+
+**Variants:** default, danger
+
+**States:** default
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.primary\` |
+| color | \`color.textOnPrimary\` |
+| radius | \`radius.sm\` |
+| paddingX | \`spacing.2\` |
+
+**Do:**
+- Use for short status labels (1-2 words).
+
+**Avoid:**
+- Don't use Badge as a button — it is not interactive.
+
+**Accessibility (contrast):**
+
+- color.textOnPrimary on color.primary: 7.79:1 AA ✓
+
+### Button
+
+_Trigger a single, clear action._
+
+**Status:** published
+
+**Variants:** primary, secondary, ghost
+
+**States:** default, hover, focus, disabled, loading
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.primary\` |
+| color | \`color.textOnPrimary\` |
+| radius | \`radius.md\` |
+| paddingX | \`spacing.3\` |
+| paddingY | \`spacing.2\` |
+| font | \`typography.label.sm\` |
+
+**Do:**
+- Use for the single primary action on a screen.
+
+**Avoid:**
+- Don't use for navigation — use a Link.
+- Don't place two primary Buttons side by side.
+
+**Accessibility (contrast):**
+
+- color.textOnPrimary on color.primary: 7.79:1 AA ✓
+
+**Keyboard:** Enter/Space activate
+
+### Card
+
+_Group related content on a surface._
+
+**Status:** published
+
+**Variants:** default
+
+**States:** default
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.surface\` |
+| radius | \`radius.lg\` |
+| padding | \`spacing.4\` |
+| shadow | \`shadow.sm\` |
+
+**Do:**
+- Use to group related content into a scannable unit.
+
+**Avoid:**
+- Don't nest cards more than one level deep.
+
+**Accessibility (contrast):**
+
+- color.text on color.surface: 17.44:1 AA ✓
+
+### Dialog
+
+_Interrupt the flow for a focused, modal task._
+
+**Status:** published
+
+**Variants:** default
+
+**States:** open, closed
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.surface\` |
+| radius | \`radius.lg\` |
+| padding | \`spacing.6\` |
+| shadow | \`shadow.md\` |
+
+**Do:**
+- Use for a focused decision or task that blocks the underlying page.
+
+**Avoid:**
+- Don't stack multiple Dialogs.
+- Don't use for non-blocking info.
+
+**Accessibility (contrast):**
+
+- color.text on color.surface: 17.44:1 AA ✓
+
+**Keyboard:** Esc closes, Focus is trapped, Focus returns to trigger on close
+
+### Input
+
+_Collect a single line of text from the user._
+
+**Status:** published
+
+**Variants:** default, error
+
+**States:** default, focus, disabled
+
+**Token bindings:**
+
+| Property | Token |
+| --- | --- |
+| background | \`color.surface\` |
+| color | \`color.text\` |
+| borderColor | \`color.border\` |
+| radius | \`radius.sm\` |
+| paddingX | \`spacing.3\` |
+| paddingY | \`spacing.2\` |
+
+**Do:**
+- Always pair with a visible label.
+
+**Avoid:**
+- Don't use placeholder text as the only label.
+
+**Accessibility (contrast):**
+
+- color.text on color.surface: 17.44:1 AA ✓
+- color.border on color.surface: 1.66:1 AA ✗
+
+**Keyboard:** Tab to focus, Type to edit
+
+## Patterns
+### Auth form
+
+_Let a returning user sign in._
+
+**Usage:** Use on dedicated sign-in pages, centered on the screen.
+
+**Do:**
+- Use one primary Button (Sign in) and label every Input.
+
+**Avoid:**
+- Don't add more than the fields needed to authenticate.
+
+### Empty state
+
+_Explain why a view is empty and offer the next action._
+
+**Usage:** Use when a list/collection has no items yet.
+
+**Do:**
+- Explain the empty state and give one clear primary action.
+
+**Avoid:**
+- Don't show an empty state that looks like an error.
+
+### Pricing card
+
+_Present a single plan and its call to action._
+
+**Usage:** Use in a row of comparable plans.
+
+**Do:**
+- Highlight at most one recommended plan with the primary Button.
+
+**Avoid:**
+- Don't overload the card with more than ~5 feature lines.
+
+### Settings section
+
+_Group a set of related settings with a save action._
+
+**Usage:** Use within a settings page, one section per concern.
+
+**Do:**
+- Group related fields and provide a single save action per section.
+
+**Avoid:**
+- Don't auto-save destructive changes without confirmation.
+
+"
+`;
+
+exports[`golden snapshots > shadcn 1`] = `
+"{
+  "name": "Acme UI",
+  "schemaVersion": "1.0.0",
+  "commit": "draft",
+  "items": [
+    {
+      "name": "alert",
+      "type": "registry:ui",
+      "intent": "Communicate an important, contextual message.",
+      "dependencies": [],
+      "variants": [
+        "info",
+        "danger"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokens": {
+        "background": "color.surface",
+        "color": "color.text",
+        "borderColor": "color.border",
+        "radius": "radius.md",
+        "padding": "spacing.3"
+      },
+      "files": [
+        {
+          "path": "ui/alert.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface AlertProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"info\\" | \\"danger\\";\\n}\\n\\nexport function Alert({ variant, ...props }: AlertProps) {\\n  return <div data-slot=\\"alert\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    },
+    {
+      "name": "badge",
+      "type": "registry:ui",
+      "intent": "Label or annotate with a small status token.",
+      "dependencies": [],
+      "variants": [
+        "default",
+        "danger"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokens": {
+        "background": "color.primary",
+        "color": "color.textOnPrimary",
+        "radius": "radius.sm",
+        "paddingX": "spacing.2"
+      },
+      "files": [
+        {
+          "path": "ui/badge.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface BadgeProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"default\\" | \\"danger\\";\\n}\\n\\nexport function Badge({ variant, ...props }: BadgeProps) {\\n  return <div data-slot=\\"badge\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "type": "registry:ui",
+      "intent": "Trigger a single, clear action.",
+      "dependencies": [],
+      "variants": [
+        "primary",
+        "secondary",
+        "ghost"
+      ],
+      "states": [
+        "default",
+        "hover",
+        "focus",
+        "disabled",
+        "loading"
+      ],
+      "tokens": {
+        "background": "color.primary",
+        "color": "color.textOnPrimary",
+        "radius": "radius.md",
+        "paddingX": "spacing.3",
+        "paddingY": "spacing.2",
+        "font": "typography.label.sm"
+      },
+      "files": [
+        {
+          "path": "ui/button.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface ButtonProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"primary\\" | \\"secondary\\" | \\"ghost\\";\\n}\\n\\nexport function Button({ variant, ...props }: ButtonProps) {\\n  return <div data-slot=\\"button\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    },
+    {
+      "name": "card",
+      "type": "registry:ui",
+      "intent": "Group related content on a surface.",
+      "dependencies": [],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "default"
+      ],
+      "tokens": {
+        "background": "color.surface",
+        "radius": "radius.lg",
+        "padding": "spacing.4",
+        "shadow": "shadow.sm"
+      },
+      "files": [
+        {
+          "path": "ui/card.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface CardProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"default\\";\\n}\\n\\nexport function Card({ variant, ...props }: CardProps) {\\n  return <div data-slot=\\"card\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    },
+    {
+      "name": "dialog",
+      "type": "registry:ui",
+      "intent": "Interrupt the flow for a focused, modal task.",
+      "dependencies": [],
+      "variants": [
+        "default"
+      ],
+      "states": [
+        "open",
+        "closed"
+      ],
+      "tokens": {
+        "background": "color.surface",
+        "radius": "radius.lg",
+        "padding": "spacing.6",
+        "shadow": "shadow.md"
+      },
+      "files": [
+        {
+          "path": "ui/dialog.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface DialogProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"default\\";\\n}\\n\\nexport function Dialog({ variant, ...props }: DialogProps) {\\n  return <div data-slot=\\"dialog\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    },
+    {
+      "name": "input",
+      "type": "registry:ui",
+      "intent": "Collect a single line of text from the user.",
+      "dependencies": [],
+      "variants": [
+        "default",
+        "error"
+      ],
+      "states": [
+        "default",
+        "focus",
+        "disabled"
+      ],
+      "tokens": {
+        "background": "color.surface",
+        "color": "color.text",
+        "borderColor": "color.border",
+        "radius": "radius.sm",
+        "paddingX": "spacing.3",
+        "paddingY": "spacing.2"
+      },
+      "files": [
+        {
+          "path": "ui/input.tsx",
+          "content": "import * as React from \\"react\\";\\n\\nexport interface InputProps extends React.HTMLAttributes<HTMLElement> {\\n  variant?: \\"default\\" | \\"error\\";\\n}\\n\\nexport function Input({ variant, ...props }: InputProps) {\\n  return <div data-slot=\\"input\\" data-variant={variant} {...props} />;\\n}"
+        }
+      ]
+    }
+  ]
+}
+"
+`;
+
+exports[`golden snapshots > tailwind 1`] = `
+"/*
+ * Yahoda export — Tailwind theme
+ * system: Acme UI
+ * schemaVersion: 1.0.0
+ * commit: draft
+ */
+import type { Config } from "tailwindcss";
+
+const config: Pick<Config, "theme"> = {
+  "theme": {
+    "extend": {
+      "colors": {
+        "border": "var(--color-border)",
+        "danger": "var(--color-danger)",
+        "primary": "var(--color-primary)",
+        "primaryHover": "var(--color-primaryHover)",
+        "surface": "var(--color-surface)",
+        "text": "var(--color-text)",
+        "textOnPrimary": "var(--color-textOnPrimary)",
+        "palette.blue.600": "var(--palette-blue-600)",
+        "palette.blue.700": "var(--palette-blue-700)",
+        "palette.red.600": "var(--palette-red-600)",
+        "palette.slate.300": "var(--palette-slate-300)",
+        "palette.slate.900": "var(--palette-slate-900)",
+        "palette.white": "var(--palette-white)"
+      },
+      "borderRadius": {
+        "lg": "var(--radius-lg)",
+        "md": "var(--radius-md)",
+        "sm": "var(--radius-sm)"
+      },
+      "spacing": {
+        "1": "var(--spacing-1)",
+        "2": "var(--spacing-2)",
+        "3": "var(--spacing-3)",
+        "4": "var(--spacing-4)",
+        "6": "var(--spacing-6)"
+      },
+      "fontSize": {
+        "body-md": [
+          "1rem",
+          {
+            "lineHeight": "1.5",
+            "fontWeight": "400"
+          }
+        ],
+        "heading-lg": [
+          "2rem",
+          {
+            "lineHeight": "1.2",
+            "fontWeight": "700"
+          }
+        ],
+        "label-sm": [
+          "0.875rem",
+          {
+            "lineHeight": "1.4",
+            "fontWeight": "500"
+          }
+        ]
+      },
+      "boxShadow": {
+        "md": "var(--shadow-md)",
+        "sm": "var(--shadow-sm)"
+      },
+      "transitionDuration": {
+        "fast": "var(--duration-fast)"
+      },
+      "transitionTimingFunction": {
+        "standard": "var(--easing-standard)"
+      }
+    }
+  }
+};
+
+export default config;
+"
+`;

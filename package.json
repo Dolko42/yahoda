@@ -1,0 +1,19 @@
+{
+  "name": "yahoda",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Yahoda — a single source of truth for AI-friendly, designer-friendly, and developer-friendly UI systems.",
+  "packageManager": "pnpm@10.29.3",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm --filter @yahoda/core test:watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

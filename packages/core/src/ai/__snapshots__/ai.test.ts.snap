@@ -1,0 +1,192 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
+"# AI context — Acme UI
+
+> schemaVersion 1.0.0 · commit draft · hash h_1c818c4b
+> Use only the components, tokens, and rules below. Do not invent components or values.
+
+## Tokens
+
+| Token | Type | Tier | Value | Usage |
+| --- | --- | --- | --- | --- |
+| \`color.border\` | color | semantic | #C4C9D1 | Default border/divider color. |
+| \`color.danger\` | color | semantic | #C0341D | Destructive/error emphasis. |
+| \`color.primary\` | color | semantic | #2448B8 | Primary actions and brand emphasis. |
+| \`color.primaryHover\` | color | semantic | #1E3FA0 | Hover/active state of primary surfaces. |
+| \`color.surface\` | color | semantic | #FFFFFF | Default surface/background for components. |
+| \`color.text\` | color | semantic | #181A1D | Default body text color. |
+| \`color.textOnPrimary\` | color | semantic | #FFFFFF | Text/icon color on primary surfaces. |
+| \`duration.fast\` | duration | semantic | 150ms | Hover/press micro-interactions. |
+| \`easing.standard\` | easing | semantic | cubic-bezier(0.2, 0, 0, 1) | Default easing for UI transitions. |
+| \`palette.blue.600\` | color | primitive | #2448B8 |  |
+| \`palette.blue.700\` | color | primitive | #1E3FA0 |  |
+| \`palette.red.600\` | color | primitive | #C0341D |  |
+| \`palette.slate.300\` | color | primitive | #C4C9D1 |  |
+| \`palette.slate.900\` | color | primitive | #181A1D |  |
+| \`palette.white\` | color | primitive | #FFFFFF |  |
+| \`radius.lg\` | dimension | semantic | 12px | Cards, dialogs. |
+| \`radius.md\` | dimension | semantic | 8px | Buttons, alerts. |
+| \`radius.sm\` | dimension | semantic | 4px | Inputs, badges, small controls. |
+| \`shadow.md\` | shadow | semantic | 1 shadow layer(s) |  |
+| \`shadow.sm\` | shadow | semantic | 1 shadow layer(s) |  |
+| \`spacing.1\` | dimension | semantic | 4px |  |
+| \`spacing.2\` | dimension | semantic | 8px |  |
+| \`spacing.3\` | dimension | semantic | 12px |  |
+| \`spacing.4\` | dimension | semantic | 16px |  |
+| \`spacing.6\` | dimension | semantic | 24px |  |
+| \`typography.body.md\` | typography | semantic | Inter 1rem/1.5 400 | Default body copy. |
+| \`typography.heading.lg\` | typography | semantic | Inter 2rem/1.2 700 | Page and section headings. |
+| \`typography.label.sm\` | typography | semantic | Inter 0.875rem/1.4 500 | Form labels and button text. |
+
+## Components
+
+### Alert
+_Communicate an important, contextual message._
+
+- **Variants:** info, danger
+- **States:** default
+- **Tokens:** background=\`color.surface\`, borderColor=\`color.border\`, color=\`color.text\`, padding=\`spacing.3\`, radius=\`radius.md\`
+
+**Do:**
+- Use for contextual, in-page messages tied to a task.
+**Avoid:**
+- Don't use for transient notifications — use a Toast (later).
+**Accessibility:**
+- color.text on color.surface = 17.44:1 (AA pass)
+\`\`\`tsx
+<Alert tone="danger">Something went wrong</Alert>
+\`\`\`
+
+### Badge
+_Label or annotate with a small status token._
+
+- **Variants:** default, danger
+- **States:** default
+- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, paddingX=\`spacing.2\`, radius=\`radius.sm\`
+
+**Do:**
+- Use for short status labels (1-2 words).
+**Avoid:**
+- Don't use Badge as a button — it is not interactive.
+**Accessibility:**
+- color.textOnPrimary on color.primary = 7.79:1 (AA pass)
+\`\`\`tsx
+<Badge>New</Badge>
+\`\`\`
+
+### Button
+_Trigger a single, clear action._
+
+- **Variants:** primary, secondary, ghost
+- **States:** default, hover, focus, disabled, loading
+- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, font=\`typography.label.sm\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.md\`
+
+**Do:**
+- Use for the single primary action on a screen.
+**Avoid:**
+- Don't use for navigation — use a Link.
+- Don't place two primary Buttons side by side.
+**Accessibility:**
+- color.textOnPrimary on color.primary = 7.79:1 (AA pass)
+\`\`\`tsx
+<Button variant="primary">Save</Button>
+\`\`\`
+
+### Card
+_Group related content on a surface._
+
+- **Variants:** default
+- **States:** default
+- **Tokens:** background=\`color.surface\`, padding=\`spacing.4\`, radius=\`radius.lg\`, shadow=\`shadow.sm\`
+
+**Do:**
+- Use to group related content into a scannable unit.
+**Avoid:**
+- Don't nest cards more than one level deep.
+**Accessibility:**
+- color.text on color.surface = 17.44:1 (AA pass)
+\`\`\`tsx
+<Card>…</Card>
+\`\`\`
+
+### Dialog
+_Interrupt the flow for a focused, modal task._
+
+- **Variants:** default
+- **States:** open, closed
+- **Tokens:** background=\`color.surface\`, padding=\`spacing.6\`, radius=\`radius.lg\`, shadow=\`shadow.md\`
+
+**Do:**
+- Use for a focused decision or task that blocks the underlying page.
+**Avoid:**
+- Don't stack multiple Dialogs.
+- Don't use for non-blocking info.
+**Accessibility:**
+- color.text on color.surface = 17.44:1 (AA pass)
+\`\`\`tsx
+<Dialog open>…</Dialog>
+\`\`\`
+
+### Input
+_Collect a single line of text from the user._
+
+- **Variants:** default, error
+- **States:** default, focus, disabled
+- **Tokens:** background=\`color.surface\`, borderColor=\`color.border\`, color=\`color.text\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.sm\`
+
+**Do:**
+- Always pair with a visible label.
+**Avoid:**
+- Don't use placeholder text as the only label.
+**Accessibility:**
+- color.text on color.surface = 17.44:1 (AA pass)
+- color.border on color.surface = 1.66:1 (AA fail)
+\`\`\`tsx
+<Input aria-label="Email" />
+\`\`\`
+
+## Patterns
+
+### Auth form
+_Let a returning user sign in._
+- **Usage:** Use on dedicated sign-in pages, centered on the screen.
+- **Uses:** Button, Input
+
+**Do:**
+- Use one primary Button (Sign in) and label every Input.
+**Avoid:**
+- Don't add more than the fields needed to authenticate.
+
+### Empty state
+_Explain why a view is empty and offer the next action._
+- **Usage:** Use when a list/collection has no items yet.
+- **Uses:** Button
+
+**Do:**
+- Explain the empty state and give one clear primary action.
+**Avoid:**
+- Don't show an empty state that looks like an error.
+
+### Pricing card
+_Present a single plan and its call to action._
+- **Usage:** Use in a row of comparable plans.
+- **Uses:** Badge, Button, Card
+
+**Do:**
+- Highlight at most one recommended plan with the primary Button.
+**Avoid:**
+- Don't overload the card with more than ~5 feature lines.
+
+### Settings section
+_Group a set of related settings with a save action._
+- **Usage:** Use within a settings page, one section per concern.
+- **Uses:** Button, Card, Input
+
+**Do:**
+- Group related fields and provide a single save action per section.
+**Avoid:**
+- Don't auto-save destructive changes without confirmation.
+
+"
+`;

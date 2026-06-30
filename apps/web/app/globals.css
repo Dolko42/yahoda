@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * App chrome palette — neutral steel grey. The previewed design system has its own
+ * colors (applied inline from resolved tokens) and must never read these variables.
+ * See docs/ui-system.md.
+ */
+:root {
+  --app-page: #eceef1;
+  --app-surface: #e3e6ea;
+  --app-canvas: #d7dbe0;
+  --app-border: #c4c9d1;
+  --app-text-strong: #181a1d;
+  --app-text-muted: #50555d;
+  --app-text-faint: #7c828b;
+  --app-primary: #1f4fd8;
+
+  --app-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --app-font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* visible keyboard focus across the chrome (mouse clicks don't trigger :focus-visible) */
+:focus-visible {
+  outline: 2px solid var(--app-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+body {
+  background: var(--app-page);
+  color: var(--app-text-strong);
+  font-family: var(--app-font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+ * Preview isolation scope. Content rendered inside `.ds-scope` represents the user's
+ * design system. It gets a clean white backdrop and never inherits chrome accents.
+ */
+.ds-scope {
+  color: #181a1d;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* motion-token preview animation */
+@keyframes ds-slide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(180px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-scope * {
+    animation: none !important;
+  }
+}
+
+/* thin, quiet scrollbars to keep the chrome calm */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+  border-radius: 8px;
+}
