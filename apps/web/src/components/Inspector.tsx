@@ -20,6 +20,7 @@ import { EditRow, NumberField, SelectField, TextArea, TextField } from "./edit/C
 import { TokenValueEditor } from "./edit/TokenValueEditor";
 import { AiRulesEditor } from "./edit/AiRulesEditor";
 import { DeleteTokenButton } from "./edit/DeleteTokenButton";
+import { RecipeEditor } from "./edit/RecipeEditor";
 
 const TABS: { id: InspectorTab; label: string }[] = [
   { id: "properties", label: "Properties" },
@@ -120,10 +121,11 @@ function PropertiesTab({ ds, sel }: { ds: DesignSystem; sel: ResolvedNode }) {
           <TextField value={c.intent ?? ""} placeholder="Why this component exists…"
             onCommit={(v) => patchComponent(c.id, { intent: v })} />
         </EditRow>
-        <Field label="Variants">{c.variants.map((v) => v.name).join(", ") || "—"}</Field>
-        <Field label="States">{c.states.map((s) => s.name).join(", ") || "—"}</Field>
         {c.slots && <Field label="Slots">{c.slots.map((s) => s.name).join(", ")}</Field>}
-        <Field label="Bindings">{c.bindings.length}</Field>
+        <div className="mt-3 mb-1 text-[11px] font-semibold uppercase tracking-wide text-faint">
+          Recipe
+        </div>
+        <RecipeEditor ds={ds} component={c} />
       </div>
     );
   }

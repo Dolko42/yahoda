@@ -29,12 +29,19 @@ export interface ValidationReport {
   ok: boolean;
 }
 
-/** Maps a binding property to the token type it must be fed by. */
-const PROPERTY_TOKEN_TYPE: Record<string, TokenType> = {
+/**
+ * Maps a binding property to the token type it must be fed by. This is the single
+ * source of truth for property→token-type compatibility, consumed by validation, the
+ * property catalog (`propertySpec`), and the token picker UI.
+ */
+export const PROPERTY_TOKEN_TYPE: Record<string, TokenType> = {
   background: "color",
   color: "color",
+  textColor: "color",
   foreground: "color",
   borderColor: "color",
+  focusBorderColor: "color",
+  placeholderColor: "color",
   radius: "dimension",
   borderRadius: "dimension",
   padding: "dimension",
@@ -47,10 +54,13 @@ const PROPERTY_TOKEN_TYPE: Record<string, TokenType> = {
   minHeight: "dimension",
   font: "typography",
   typography: "typography",
+  titleTypography: "typography",
+  bodyTypography: "typography",
   shadow: "shadow",
   elevation: "shadow",
   border: "border",
   duration: "duration",
+  transition: "duration",
   easing: "easing",
   opacity: "opacity",
   zIndex: "zIndex",

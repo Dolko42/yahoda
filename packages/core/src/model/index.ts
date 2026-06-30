@@ -1,3 +1,5 @@
 export * from "./parse.js";
 export * from "./validate.js";
 export * from "./crud.js";
+export * from "./recipe.js";
+export * from "./propertySpec.js";

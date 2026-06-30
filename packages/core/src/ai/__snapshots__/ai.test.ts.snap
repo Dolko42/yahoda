@@ -3,7 +3,7 @@
 exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 "# AI context — Acme UI
 
-> schemaVersion 1.0.0 · commit draft · hash h_1c818c4b
+> schemaVersion 1.0.0 · commit draft · hash h_b41bf793
 > Use only the components, tokens, and rules below. Do not invent components or values.
 
 ## Tokens
@@ -17,6 +17,7 @@ exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 | \`color.surface\` | color | semantic | #FFFFFF | Default surface/background for components. |
 | \`color.text\` | color | semantic | #181A1D | Default body text color. |
 | \`color.textOnPrimary\` | color | semantic | #FFFFFF | Text/icon color on primary surfaces. |
+| \`color.transparent\` | color | semantic | transparent | No fill — e.g. ghost button background. |
 | \`duration.fast\` | duration | semantic | 150ms | Hover/press micro-interactions. |
 | \`easing.standard\` | easing | semantic | cubic-bezier(0.2, 0, 0, 1) | Default easing for UI transitions. |
 | \`palette.blue.600\` | color | primitive | #2448B8 |  |
@@ -80,7 +81,7 @@ _Trigger a single, clear action._
 
 - **Variants:** primary, secondary, ghost
 - **States:** default, hover, focus, disabled, loading
-- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, font=\`typography.label.sm\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.md\`
+- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, font=\`typography.label.sm\`, gap=\`spacing.1\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.md\`
 
 **Do:**
 - Use for the single primary action on a screen.

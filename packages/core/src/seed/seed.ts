@@ -54,6 +54,9 @@ const tokens: Token[] = [
     group: "Surface", meta },
   { id: "t.color.danger", name: "color.danger", type: "color", tier: "semantic",
     value: { $ref: "t.red.600" }, usage: "Destructive/error emphasis.", group: "Status", meta },
+  { id: "t.color.transparent", name: "color.transparent", type: "color", tier: "semantic",
+    value: { color: "transparent" }, usage: "No fill — e.g. ghost button background.",
+    group: "Surface", meta },
 
   // radius
   { id: "t.radius.sm", name: "radius.sm", type: "dimension", tier: "semantic",
@@ -128,14 +131,29 @@ const components: Component[] = [
       { id: "c.button.s.loading", name: "loading" },
     ],
     bindings: [
+      // --- base recipe (shared by every variant) ---
       { id: "c.button.b1", property: "background", tokenId: "t.color.primary" },
-      { id: "c.button.b2", property: "background", tokenId: "t.color.primaryHover",
-        appliesTo: { state: "hover" } },
       { id: "c.button.b3", property: "color", tokenId: "t.color.textOnPrimary" },
       { id: "c.button.b4", property: "radius", tokenId: "t.radius.md" },
       { id: "c.button.b5", property: "paddingX", tokenId: "t.spacing.3" },
       { id: "c.button.b6", property: "paddingY", tokenId: "t.spacing.2" },
       { id: "c.button.b7", property: "font", tokenId: "t.type.label.sm" },
+      { id: "c.button.b8", property: "gap", tokenId: "t.spacing.1" },
+      // --- state override: hover (applies across variants) ---
+      { id: "c.button.b2", property: "background", tokenId: "t.color.primaryHover",
+        appliesTo: { state: "hover" } },
+      // --- variant override: secondary (neutral surface, bordered) ---
+      { id: "c.button.b9", property: "background", tokenId: "t.color.surface",
+        appliesTo: { variant: "secondary" } },
+      { id: "c.button.b10", property: "color", tokenId: "t.color.text",
+        appliesTo: { variant: "secondary" } },
+      { id: "c.button.b11", property: "borderColor", tokenId: "t.color.border",
+        appliesTo: { variant: "secondary" } },
+      // --- variant override: ghost (transparent, primary text) ---
+      { id: "c.button.b12", property: "background", tokenId: "t.color.transparent",
+        appliesTo: { variant: "ghost" } },
+      { id: "c.button.b13", property: "color", tokenId: "t.color.primary",
+        appliesTo: { variant: "ghost" } },
     ],
     accessibility: {
       contrast: [

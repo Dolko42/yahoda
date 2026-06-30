@@ -5,6 +5,8 @@ import type {
   Pattern,
   Token,
 } from "../schema/index.js";
+import { isRefValue } from "../schema/index.js";
+import { getDependents } from "../graph/index.js";
 
 /**
  * Pure, immutable CRUD over the working set. Each function returns a NEW DesignSystem;
@@ -51,6 +53,116 @@ export function updateToken(
 
 export function removeToken(ds: DesignSystem, id: string, clock = now()): DesignSystem {
   return bumpSystem({ ...ds, tokens: removeById(ds.tokens, id) }, clock);
+}
+
+/**
+ * Rewrite every reference to token `fromId` so it points at `toId` instead — across token
+ * aliases, component bindings, contrast rules, AI links, pattern layout gaps, and doc
+ * targets. The tokens themselves are left in place; only references move. Pure.
+ *
+ * This is the safe-reassignment primitive: combined with `removeToken` it lets a used token
+ * be deleted without ever leaving a broken reference.
+ */
+export function reassignToken(
+  ds: DesignSystem,
+  fromId: string,
+  toId: string,
+  clock = now(),
+): DesignSystem {
+  if (fromId === toId) return ds;
+  const swap = (id: string) => (id === fromId ? toId : id);
+  let changed = false;
+  const mark = <T>(v: T): T => ((changed = true), v);
+
+  const tokens = ds.tokens.map((t) => {
+    let next = t;
+    if (isRefValue(t.value) && t.value.$ref === fromId) {
+      next = mark({ ...next, value: { $ref: toId }, meta: { ...next.meta, updatedAt: clock } });
+    }
+    if (next.deprecated?.replacedBy === fromId) {
+      next = mark({ ...next, deprecated: { ...next.deprecated, replacedBy: toId } });
+    }
+    return next;
+  });
+
+  const components = ds.components.map((c) => {
+    const bindings = c.bindings.map((b) =>
+      b.tokenId === fromId ? mark({ ...b, tokenId: toId }) : b,
+    );
+    const contrast = c.accessibility.contrast.map((r) =>
+      r.foregroundTokenId === fromId || r.backgroundTokenId === fromId
+        ? mark({
+            ...r,
+            foregroundTokenId: swap(r.foregroundTokenId),
+            backgroundTokenId: swap(r.backgroundTokenId),
+          })
+        : r,
+    );
+    const linkedTokens = c.aiRules.linkedTokens?.map(swap);
+    const touched =
+      bindings !== c.bindings ||
+      contrast !== c.accessibility.contrast ||
+      (linkedTokens && c.aiRules.linkedTokens?.some((id) => id === fromId));
+    if (!touched) return c;
+    return {
+      ...c,
+      bindings,
+      accessibility: { ...c.accessibility, contrast },
+      aiRules: linkedTokens ? { ...c.aiRules, linkedTokens } : c.aiRules,
+      meta: { ...c.meta, updatedAt: clock },
+    };
+  });
+
+  const patterns = ds.patterns.map((p) => {
+    const remap = (node: Pattern["composition"][number]): Pattern["composition"][number] => {
+      const gap = node.layout?.gap === fromId ? mark(toId) : node.layout?.gap;
+      const children = node.children?.map(remap);
+      if (gap === node.layout?.gap && children === node.children) return node;
+      return {
+        ...node,
+        ...(node.layout ? { layout: { ...node.layout, ...(gap ? { gap } : {}) } } : {}),
+        ...(children ? { children } : {}),
+      };
+    };
+    const composition = p.composition.map(remap);
+    return composition === p.composition ? p : { ...p, composition };
+  });
+
+  const docs = ds.docs.map((d) =>
+    d.target?.kind === "token" && d.target.id === fromId
+      ? mark({ ...d, target: { ...d.target, id: toId } })
+      : d,
+  );
+
+  if (!changed) return ds;
+  return bumpSystem({ ...ds, tokens, components, patterns, docs }, clock);
+}
+
+export interface DeleteTokenOptions {
+  /** if the token is in use, references are reassigned here before removal */
+  reassignTo?: string;
+  clock?: string;
+}
+
+/**
+ * Delete a token without ever leaving a broken reference. If the token is unused it is
+ * removed directly. If it is used, `reassignTo` must be provided (references move there
+ * first); otherwise this throws so the caller can prompt for a reassignment target.
+ */
+export function deleteTokenSafely(
+  ds: DesignSystem,
+  id: string,
+  opts: DeleteTokenOptions = {},
+): DesignSystem {
+  const clock = opts.clock ?? now();
+  const used = getDependents(ds, id).length > 0;
+  if (!used) return removeToken(ds, id, clock);
+  if (!opts.reassignTo) {
+    throw new Error(
+      `deleteTokenSafely: token "${id}" is in use; provide reassignTo to move references first`,
+    );
+  }
+  return removeToken(reassignToken(ds, id, opts.reassignTo, clock), id, clock);
 }
 
 // --- components ------------------------------------------------------------

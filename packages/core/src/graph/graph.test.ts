@@ -15,13 +15,22 @@ describe("dependency graph", () => {
     const deps = ids(getDependencies(ds, "c.button"));
     expect(deps).toEqual(
       [
+        // base recipe
         "t.color.primary",
-        "t.color.primaryHover",
         "t.color.textOnPrimary",
         "t.radius.md",
+        "t.spacing.1",
         "t.spacing.2",
         "t.spacing.3",
         "t.type.label.sm",
+        // hover state override
+        "t.color.primaryHover",
+        // secondary variant overrides
+        "t.color.surface",
+        "t.color.text",
+        "t.color.border",
+        // ghost variant override
+        "t.color.transparent",
       ].sort(),
     );
   });

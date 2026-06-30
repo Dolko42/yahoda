@@ -5,6 +5,7 @@ import { useWorkspace } from "@/store/workspace";
 import { countChanges } from "@/lib/diff";
 import { PublishDialog } from "./PublishDialog";
 import { ExportMenu } from "./ExportMenu";
+import { AuthControl } from "./AuthControl";
 
 export function Navbar() {
   const ds = useWorkspace((s) => s.ds);
@@ -43,6 +44,7 @@ export function Navbar() {
           {draftCount > 0 ? `${draftCount} unpublished` : published ? "Published" : "Draft"}
         </span>
 
+        <AuthControl />
         <ExportMenu />
         <button
           onClick={discardDraft}

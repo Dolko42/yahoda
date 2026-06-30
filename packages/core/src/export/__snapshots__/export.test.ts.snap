@@ -23,6 +23,7 @@ exports[`golden snapshots > css 1`] = `
   --color-surface: var(--palette-white);
   --color-text: var(--palette-slate-900);
   --color-textOnPrimary: var(--palette-white);
+  --color-transparent: transparent;
   --duration-fast: 150ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
   --radius-lg: 12px;
@@ -73,6 +74,7 @@ Seed/example design system for Yahoda.
 | \`color.surface\` | semantic | → palette.white | #FFFFFF | Default surface/background for components. |
 | \`color.text\` | semantic | → palette.slate.900 | #181A1D | Default body text color. |
 | \`color.textOnPrimary\` | semantic | → palette.white | #FFFFFF | Text/icon color on primary surfaces. |
+| \`color.transparent\` | semantic | transparent |  | No fill — e.g. ghost button background. |
 | \`duration.fast\` | semantic | 150ms |  | Hover/press micro-interactions. |
 | \`easing.standard\` | semantic | cubic-bezier(0.2, 0, 0, 1) |  | Default easing for UI transitions. |
 | \`palette.blue.600\` | primitive | #2448B8 |  |  |
@@ -174,6 +176,7 @@ _Trigger a single, clear action._
 | paddingX | \`spacing.3\` |
 | paddingY | \`spacing.2\` |
 | font | \`typography.label.sm\` |
+| gap | \`spacing.1\` |
 
 **Do:**
 - Use for the single primary action on a screen.
@@ -415,7 +418,8 @@ exports[`golden snapshots > shadcn 1`] = `
         "radius": "radius.md",
         "paddingX": "spacing.3",
         "paddingY": "spacing.2",
-        "font": "typography.label.sm"
+        "font": "typography.label.sm",
+        "gap": "spacing.1"
       },
       "files": [
         {
@@ -527,6 +531,7 @@ const config: Pick<Config, "theme"> = {
         "surface": "var(--color-surface)",
         "text": "var(--color-text)",
         "textOnPrimary": "var(--color-textOnPrimary)",
+        "transparent": "var(--color-transparent)",
         "palette.blue.600": "var(--palette-blue-600)",
         "palette.blue.700": "var(--palette-blue-700)",
         "palette.red.600": "var(--palette-red-600)",

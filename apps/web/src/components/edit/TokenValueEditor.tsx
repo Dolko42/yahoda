@@ -93,6 +93,37 @@ export function TokenValueEditor({ ds, token }: { ds: DesignSystem; token: Token
     return <TextField value={value.easing} mono onCommit={(s) => commit({ easing: s })} />;
   }
 
+  if ("typography" in value) {
+    const t = value.typography;
+    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "—";
+    const rows: [string, string][] = [
+      ["Font family", t.fontFamily],
+      ["Font size", size],
+      ["Weight", String(t.fontWeight)],
+      ["Line height", String(t.lineHeight)],
+      ["Letter spacing", t.letterSpacing ? `${t.letterSpacing.dimension}${t.letterSpacing.unit}` : "—"],
+    ];
+    return (
+      <div className="space-y-1.5">
+        {aliasNote}
+        {rows.map(([label, val]) => (
+          <div key={label} className="flex items-center justify-between gap-2 opacity-60">
+            <span className="text-[11px] uppercase tracking-wide text-faint">{label}</span>
+            <input
+              value={val}
+              readOnly
+              disabled
+              className="w-36 cursor-not-allowed rounded-md border border-line bg-page px-2 py-1 font-mono text-[12px] text-muted"
+            />
+          </div>
+        ))}
+        <div className="text-[11px] text-faint">
+          Rich typography editing (families, scales, fluid sizing) arrives in the Typography phase.
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="text-[12px] text-faint">
       Structured editing for {token.type} tokens arrives in a later phase.
