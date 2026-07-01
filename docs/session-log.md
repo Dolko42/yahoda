@@ -20,6 +20,21 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-01 — Revert Phase 3 typography (to be redone as a new phase)
+
+- **Branch / commits:** main · (this commit) — user was unhappy with Phase 3 typography and wants to redo it fresh. **Phase 3 is preserved in history at `0ab908b`** — recover from there when redoing.
+- **State:** green — `@yahoda/core` rebuilt; **111 core tests** pass (back to the Phase-2 count), **2 web tests** pass, web typecheck clean. Verified live in preview: Colors + Typography sections render, tab bar works, no console errors. Seed reverted (e.g. `color.primary` back to `#2448B8`).
+- **Done this session:**
+  - Reverted all `packages/core/src` typography changes to the pre-Phase-3 baseline (`d064f79`): removed the `fontFamily` TokenType, fluid `clamp()` values, nested-`$ref` graph/validator generalization, and the seed's family/size/fluid tokens. Deleted `model/fluid.*` and `schema/refs.*`. Exporters + golden snapshots back to Phase-2 form.
+  - Web: restored `TokenValueEditor`, `TokenPreview`, `format.ts`, `style.ts`, `tokens.ts`; deleted `TypographyEditor.tsx`.
+  - `lib/categories.ts`: typography stripped to a single "Text style" create, no families/sizes/groups (kept the generic `creates[]`/`groups` shape so today's inline tab bar keeps working).
+- **Next / open questions:**
+  - **Redo typography as a new phase** — cleaner than Phase 3. Reference the old impl at `0ab908b` for what to keep/drop. The `typography` composite type (family string + `fontSize` dimension/ref) still exists from Phase 2.
+  - Supabase live auth round-trip still deferred (carried, unaffected by this revert — mapping is generic).
+- **Gotchas / non-obvious context:**
+  - **After reverting core you must rebuild `@yahoda/core` AND restart `next dev`** (stop → `rm -rf apps/web/.next` → start) — the running dev server had cached the old `dist` and threw `isFluidValue is not exported` until restarted. The rebuilt `dist` itself was clean; the error was purely stale bundler cache.
+  - Only `categories.ts` + `Sidebar.tsx` were hand-reconciled (today's tab-bar commit rebuilt on the Phase-3 sidebar shape); everything else was a clean `git checkout d064f79 --`.
+
 ## 2026-07-01 — UI: section tabs above canvas, cleaner navbar/sidebar
 
 - **Branch / commits:** main · working tree only — **not committed** (this handoff commit will be the first). Changed: `Navbar`, `Sidebar`, `Workspace`, `store/workspace.ts`; new `SectionTabs.tsx`, `lib/categories.ts`.

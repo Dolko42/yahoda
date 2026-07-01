@@ -48,18 +48,10 @@ function resolveNested(byId: Map<string, Token>, value: TokenValue): TokenValue 
     return v;
   };
 
-  // Resolve a typography fontFamily ref to its terminal font-stack string.
-  const familyOf = (v: string | { $ref: string }): string | { $ref: string } => {
-    if (typeof v === "string") return v;
-    const t = terminalToken(byId, v.$ref);
-    return "token" in t && "fontFamily" in t.token.value ? t.token.value.fontFamily : v;
-  };
-
   if ("typography" in value) {
     const ty = value.typography;
     const fontSize = isRefValue(ty.fontSize) ? colorOf(ty.fontSize) : ty.fontSize;
-    const fontFamily = familyOf(ty.fontFamily);
-    return { typography: { ...ty, fontSize, fontFamily } } as TokenValue;
+    return { typography: { ...ty, fontSize } } as TokenValue;
   }
   if ("shadow" in value) {
     return {

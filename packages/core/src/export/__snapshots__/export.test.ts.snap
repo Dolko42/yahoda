@@ -9,12 +9,6 @@ exports[`golden snapshots > css 1`] = `
  */
 :root {
   /* primitives */
-  --fontFamily-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --fontFamily-sans: Inter, system-ui, sans-serif;
-  --fontSize-lg: 1.25rem;
-  --fontSize-md: 1rem;
-  --fontSize-sm: 0.875rem;
-  --fontSize-xl: clamp(2rem, 1.8261rem + 0.8696vw, 2.5rem);
   --palette-blue-600: #2448B8;
   --palette-blue-700: #1E3FA0;
   --palette-red-600: #C0341D;
@@ -42,16 +36,16 @@ exports[`golden snapshots > css 1`] = `
   --spacing-3: 12px;
   --spacing-4: 16px;
   --spacing-6: 24px;
-  --typography-body-md-font-family: var(--fontFamily-sans);
-  --typography-body-md-font-size: var(--fontSize-md);
+  --typography-body-md-font-family: Inter;
+  --typography-body-md-font-size: 1rem;
   --typography-body-md-line-height: 1.5;
   --typography-body-md-font-weight: 400;
-  --typography-heading-lg-font-family: var(--fontFamily-sans);
-  --typography-heading-lg-font-size: var(--fontSize-xl);
+  --typography-heading-lg-font-family: Inter;
+  --typography-heading-lg-font-size: 2rem;
   --typography-heading-lg-line-height: 1.2;
   --typography-heading-lg-font-weight: 700;
-  --typography-label-sm-font-family: var(--fontFamily-sans);
-  --typography-label-sm-font-size: var(--fontSize-sm);
+  --typography-label-sm-font-family: Inter;
+  --typography-label-sm-font-size: 0.875rem;
   --typography-label-sm-line-height: 1.4;
   --typography-label-sm-font-weight: 500;
 }
@@ -83,12 +77,6 @@ Seed/example design system for Yahoda.
 | \`color.transparent\` | semantic | transparent |  | No fill — e.g. ghost button background. |
 | \`duration.fast\` | semantic | 150ms |  | Hover/press micro-interactions. |
 | \`easing.standard\` | semantic | cubic-bezier(0.2, 0, 0, 1) |  | Default easing for UI transitions. |
-| \`fontFamily.mono\` | primitive | 'JetBrains Mono', ui-monospace, monospace |  | Code, tokens, and tabular figures. |
-| \`fontFamily.sans\` | primitive | Inter, system-ui, sans-serif |  | Default UI and body typeface. |
-| \`fontSize.lg\` | primitive | 1.25rem |  |  |
-| \`fontSize.md\` | primitive | 1rem |  |  |
-| \`fontSize.sm\` | primitive | 0.875rem |  |  |
-| \`fontSize.xl\` | primitive | 2rem→2.5rem (fluid) |  | Display/heading size that scales with the viewport. |
 | \`palette.blue.600\` | primitive | #2448B8 |  |  |
 | \`palette.blue.700\` | primitive | #1E3FA0 |  |  |
 | \`palette.red.600\` | primitive | #C0341D |  |  |
@@ -105,9 +93,9 @@ Seed/example design system for Yahoda.
 | \`spacing.3\` | semantic | 12px |  |  |
 | \`spacing.4\` | semantic | 16px |  |  |
 | \`spacing.6\` | semantic | 24px |  |  |
-| \`typography.body.md\` | semantic | →fontFamily.sans →fontSize.md/1.5 400 | Inter, system-ui, sans-serif 1rem/1.5 400 | Default body copy. |
-| \`typography.heading.lg\` | semantic | →fontFamily.sans →fontSize.xl/1.2 700 | Inter, system-ui, sans-serif 2rem→2.5rem/1.2 700 | Page and section headings. |
-| \`typography.label.sm\` | semantic | →fontFamily.sans →fontSize.sm/1.4 500 | Inter, system-ui, sans-serif 0.875rem/1.4 500 | Form labels and button text. |
+| \`typography.body.md\` | semantic | Inter 1rem/1.5 400 |  | Default body copy. |
+| \`typography.heading.lg\` | semantic | Inter 2rem/1.2 700 |  | Page and section headings. |
+| \`typography.label.sm\` | semantic | Inter 0.875rem/1.4 500 |  | Form labels and button text. |
 ## Components
 ### Alert
 
@@ -563,31 +551,23 @@ const config: Pick<Config, "theme"> = {
         "4": "var(--spacing-4)",
         "6": "var(--spacing-6)"
       },
-      "fontFamily": {
-        "mono": "var(--fontFamily-mono)",
-        "sans": "var(--fontFamily-sans)"
-      },
       "fontSize": {
-        "lg": "var(--fontSize-lg)",
-        "md": "var(--fontSize-md)",
-        "sm": "var(--fontSize-sm)",
-        "xl": "var(--fontSize-xl)",
         "body-md": [
-          "var(--fontSize-md)",
+          "1rem",
           {
             "lineHeight": "1.5",
             "fontWeight": "400"
           }
         ],
         "heading-lg": [
-          "var(--fontSize-xl)",
+          "2rem",
           {
             "lineHeight": "1.2",
             "fontWeight": "700"
           }
         ],
         "label-sm": [
-          "var(--fontSize-sm)",
+          "0.875rem",
           {
             "lineHeight": "1.4",
             "fontWeight": "500"

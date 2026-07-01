@@ -1,9 +1,8 @@
 "use client";
 
-import { type DesignSystem, type Token, isFluidValue, resolveTokenValue } from "@yahoda/core";
+import { type DesignSystem, type Token, resolveTokenValue } from "@yahoda/core";
 import { useWorkspace } from "@/store/workspace";
 import { ColorField, NumberField, SelectField, TextField } from "./Controls";
-import { FluidEditor, TypographyEditor, defaultFluid } from "./TypographyEditor";
 
 const DIM_UNITS = ["px", "rem", "em", "%"] as const;
 const DUR_UNITS = ["ms", "s"] as const;
@@ -38,68 +37,22 @@ export function TokenValueEditor({ ds, token }: { ds: DesignSystem; token: Token
     );
   }
 
-  if ("fontFamily" in value) {
+  if ("dimension" in value) {
     return (
       <div>
         {aliasNote}
-        <TextField
-          value={value.fontFamily}
-          mono
-          placeholder="Inter, system-ui, sans-serif"
-          onCommit={(s) => commit({ fontFamily: s })}
-        />
-        <div
-          className="mt-2 truncate rounded-md border border-line bg-page px-2 py-3 text-strong"
-          style={{ fontFamily: value.fontFamily }}
-        >
-          The quick brown fox jumps over the lazy dog
+        <div className="flex items-center gap-2">
+          <NumberField
+            value={value.dimension}
+            step={value.unit === "px" ? 1 : 0.125}
+            onCommit={(n) => commit({ dimension: n, unit: value.unit })}
+          />
+          <SelectField
+            value={value.unit}
+            options={DIM_UNITS}
+            onCommit={(u) => commit({ dimension: value.dimension, unit: u })}
+          />
         </div>
-      </div>
-    );
-  }
-
-  // dimension tokens can be a fixed size or a fluid (clamp) size — a toggle switches modes.
-  if ("dimension" in value || isFluidValue(value)) {
-    const fluid = isFluidValue(value);
-    return (
-      <div>
-        {aliasNote}
-        <div className="mb-1.5 flex gap-1">
-          {(["fixed", "fluid"] as const).map((m) => {
-            const on = (m === "fluid") === fluid;
-            return (
-              <button
-                key={m}
-                type="button"
-                onClick={() => {
-                  if (on) return;
-                  commit(m === "fluid" ? { fluid: defaultFluid("dimension" in value ? value : undefined) } : (isFluidValue(value) ? value.fluid.min : { dimension: 8, unit: "px" }));
-                }}
-                className={`rounded-md px-2 py-1 text-[12px] capitalize ${
-                  on ? "bg-primary text-white" : "border border-line text-muted hover:text-strong"
-                }`}
-              >
-                {m}
-              </button>
-            );
-          })}
-        </div>
-        {isFluidValue(value) ? (
-          <FluidEditor spec={value.fluid} onChange={(f) => commit({ fluid: f })} />
-        ) : "dimension" in value ? (
-          <div className="flex items-center gap-2">
-            <NumberField
-              value={value.dimension}
-              step={value.unit === "px" ? 1 : 0.125}
-              onCommit={(n) => commit({ dimension: n, unit: value.unit })}
-            />
-            <SelectField
-              value={value.unit}
-              options={DIM_UNITS}
-              onCommit={(u) => commit({ dimension: value.dimension, unit: u })}
-            />
-          </div>
-        ) : null}
       </div>
     );
   }
@@ -141,10 +94,32 @@ export function TokenValueEditor({ ds, token }: { ds: DesignSystem; token: Token
   }
 
   if ("typography" in value) {
+    const t = value.typography;
+    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "—";
+    const rows: [string, string][] = [
+      ["Font family", t.fontFamily],
+      ["Font size", size],
+      ["Weight", String(t.fontWeight)],
+      ["Line height", String(t.lineHeight)],
+      ["Letter spacing", t.letterSpacing ? `${t.letterSpacing.dimension}${t.letterSpacing.unit}` : "—"],
+    ];
     return (
-      <div>
+      <div className="space-y-1.5">
         {aliasNote}
-        <TypographyEditor ds={ds} token={resolved.token} commit={commit} />
+        {rows.map(([label, val]) => (
+          <div key={label} className="flex items-center justify-between gap-2 opacity-60">
+            <span className="text-[11px] uppercase tracking-wide text-faint">{label}</span>
+            <input
+              value={val}
+              readOnly
+              disabled
+              className="w-36 cursor-not-allowed rounded-md border border-line bg-page px-2 py-1 font-mono text-[12px] text-muted"
+            />
+          </div>
+        ))}
+        <div className="text-[11px] text-faint">
+          Rich typography editing (families, scales, fluid sizing) arrives in the Typography phase.
+        </div>
       </div>
     );
   }

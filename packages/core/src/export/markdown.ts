@@ -1,5 +1,5 @@
-import type { DimensionValue, Component, DesignSystem, Pattern, TokenValue } from "../schema/index.js";
-import { collectRefs, isFluidValue, isRefValue } from "../schema/index.js";
+import type { Component, DesignSystem, Pattern, TokenValue } from "../schema/index.js";
+import { isRefValue } from "../schema/index.js";
 import { evaluateComponentContrast } from "../a11y/index.js";
 import { resolveTokenValue } from "../resolve/index.js";
 import { byName, header, tokenNameMap } from "./util.js";
@@ -9,21 +9,9 @@ import { byName, header, tokenNameMap } from "./util.js";
  * accessibility results from the model so the output is specific, not generic.
  */
 
-const dimStr = (d: DimensionValue): string => `${d.dimension}${d.unit}`;
-
-/** A readable font-size cell: `→name` for a ref, `min→max` for fluid, else the dimension. */
-function sizeStr(fs: TokenValue, names: Map<string, string>): string {
-  if (isRefValue(fs)) return `→${names.get(fs.$ref) ?? fs.$ref}`;
-  if (isFluidValue(fs)) return `${dimStr(fs.fluid.min)}→${dimStr(fs.fluid.max)}`;
-  if ("dimension" in fs) return dimStr(fs);
-  return "—";
-}
-
 function fmt(v: TokenValue, names: Map<string, string>): string {
   if (isRefValue(v)) return `→ ${names.get(v.$ref) ?? v.$ref}`;
   if ("color" in v) return v.color;
-  if ("fontFamily" in v) return v.fontFamily;
-  if (isFluidValue(v)) return `${dimStr(v.fluid.min)}→${dimStr(v.fluid.max)} (fluid)`;
   if ("dimension" in v) return `${v.dimension}${v.unit}`;
   if ("opacity" in v) return String(v.opacity);
   if ("zIndex" in v) return String(v.zIndex);
@@ -31,8 +19,8 @@ function fmt(v: TokenValue, names: Map<string, string>): string {
   if ("easing" in v) return Array.isArray(v.easing) ? `cubic-bezier(${v.easing.join(", ")})` : v.easing;
   if ("typography" in v) {
     const t = v.typography;
-    const family = typeof t.fontFamily === "string" ? t.fontFamily : `→${names.get(t.fontFamily.$ref) ?? ""}`;
-    return `${family} ${sizeStr(t.fontSize, names)}/${t.lineHeight} ${t.fontWeight}`;
+    const size = isRefValue(t.fontSize) ? `→${names.get(t.fontSize.$ref) ?? ""}` : `${t.fontSize.dimension}${t.fontSize.unit}`;
+    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
   }
   if ("shadow" in v) return `${v.shadow.length} layer(s)`;
   if ("border" in v) return `${v.border.style} border`;
@@ -44,11 +32,7 @@ function tokensSection(ds: DesignSystem, names: Map<string, string>): string {
   const lines = ["## Tokens", "", "| Token | Tier | Value | Resolved | Usage |", "| --- | --- | --- | --- | --- |"];
   for (const t of tokens) {
     const resolved = resolveTokenValue(ds, t.id);
-    // show the concrete value whenever the raw carries any ref (top-level alias or nested)
-    const resolvedStr =
-      resolved.ok && (isRefValue(t.value) || collectRefs(t.value).length > 0)
-        ? fmt(resolved.value, names)
-        : "";
+    const resolvedStr = isRefValue(t.value) && resolved.ok ? fmt(resolved.value, names) : "";
     lines.push(
       `| \`${t.name}\` | ${t.tier} | ${fmt(t.value, names)} | ${resolvedStr} | ${t.usage ?? ""} |`,
     );

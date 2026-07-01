@@ -20,7 +20,7 @@ export interface CreateCfg {
   type: TokenType;
   namePrefix: string;
   group: string;
-  /** button label, e.g. "Font family" */
+  /** button label, e.g. "Text style" */
   label: string;
 }
 
@@ -39,28 +39,16 @@ export interface Category {
   groups?: TokenGroup[];
 }
 
-export const isFontSize = (t: Token) =>
-  t.type === "dimension" && t.name.startsWith("fontSize");
-
 export const CATEGORIES: Category[] = [
   { id: "colors", label: "Colors",
     creates: [{ type: "color", namePrefix: "color", group: "Brand", label: "Color" }],
     match: (t) => t.type === "color" },
   { id: "typography", label: "Typography",
-    creates: [
-      { type: "fontFamily", namePrefix: "fontFamily", group: "Font family", label: "Font family" },
-      { type: "dimension", namePrefix: "fontSize", group: "Font size", label: "Font size" },
-      { type: "typography", namePrefix: "typography", group: "Typography", label: "Text style" },
-    ],
-    match: (t) => t.type === "typography" || t.type === "fontFamily" || isFontSize(t),
-    groups: [
-      { label: "Font families", filter: (t) => t.type === "fontFamily" },
-      { label: "Sizes", filter: isFontSize },
-      { label: "Text styles", filter: (t) => t.type === "typography" },
-    ] },
+    creates: [{ type: "typography", namePrefix: "typography", group: "Typography", label: "Text style" }],
+    match: (t) => t.type === "typography" },
   { id: "spacing", label: "Spacing",
     creates: [{ type: "dimension", namePrefix: "spacing", group: "Spacing", label: "Spacing" }],
-    match: (t) => t.type === "dimension" && !t.name.startsWith("radius") && !isFontSize(t) },
+    match: (t) => t.type === "dimension" && !t.name.startsWith("radius") },
   { id: "radius", label: "Radius",
     creates: [{ type: "dimension", namePrefix: "radius", group: "Radius", label: "Radius" }],
     match: (t) => t.type === "dimension" && t.name.startsWith("radius") },

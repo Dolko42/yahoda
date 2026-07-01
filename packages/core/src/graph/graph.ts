@@ -1,5 +1,5 @@
 import type { DesignSystem, NodeKind, Pattern, PatternNodeShape } from "../schema/index.js";
-import { collectRefs } from "../schema/index.js";
+import { isRefValue } from "../schema/index.js";
 
 /**
  * Dependency graph derived from references in the model. Reverse dependencies and
@@ -49,8 +49,7 @@ export function buildDependencyIndex(ds: GraphSource): DependencyIndex {
   };
 
   for (const t of ds.tokens) {
-    // include nested refs (typography fontFamily/fontSize, shadow/border colors)
-    for (const ref of collectRefs(t.value)) edge(t.id, ref);
+    if (isRefValue(t.value)) edge(t.id, t.value.$ref);
   }
 
   for (const c of ds.components) {

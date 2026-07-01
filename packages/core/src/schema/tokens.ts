@@ -10,7 +10,6 @@ import { Deprecation, Id, NodeMeta } from "./common.js";
 export const TokenType = z.enum([
   "color",
   "dimension", // spacing / radius / size (unit-bearing)
-  "fontFamily", // a font stack, e.g. "Inter, system-ui, sans-serif"
   "typography", // composite
   "shadow",
   "border",
@@ -36,45 +35,16 @@ export const ColorValue = z.object({ color: z.string().min(1) }).strict();
 export const DimensionValue = z
   .object({ dimension: z.number(), unit: DimensionUnit })
   .strict();
-export type DimensionValue = z.infer<typeof DimensionValue>;
-
-/** A font stack, held by a first-class `fontFamily` primitive token. */
-export const FontFamilyValue = z.object({ fontFamily: z.string().min(1) }).strict();
-
-/**
- * Viewport-responsive size that resolves to CSS `clamp()`: the value scales linearly
- * from `min` at `minViewport` to `max` at `maxViewport`, clamped outside that range.
- * Valid anywhere a raw dimension is (a `dimension` token's value, a typography fontSize).
- */
-export const FluidDimensionValue = z
-  .object({
-    fluid: z
-      .object({
-        min: DimensionValue,
-        max: DimensionValue,
-        minViewport: DimensionValue,
-        maxViewport: DimensionValue,
-      })
-      .strict(),
-  })
-  .strict();
-export type FluidDimensionValue = z.infer<typeof FluidDimensionValue>;
-/** The inner fluid spec (min/max/viewport bounds). */
-export type FluidSpec = FluidDimensionValue["fluid"];
 
 const DimensionOrRef = z.union([DimensionValue, RefValue]);
 const ColorOrRef = z.union([ColorValue, RefValue]);
-/** A font size may be a fixed dimension, a fluid clamp, or a $ref to a scale token. */
-const FontSizeValue = z.union([DimensionValue, FluidDimensionValue, RefValue]);
-/** A font family may be a raw stack string or a $ref to a fontFamily token. */
-const FontFamilyOrRef = z.union([z.string().min(1), RefValue]);
 
 export const TypographyValue = z
   .object({
     typography: z
       .object({
-        fontFamily: FontFamilyOrRef,
-        fontSize: FontSizeValue,
+        fontFamily: z.string().min(1),
+        fontSize: DimensionOrRef,
         lineHeight: z.number().positive(),
         fontWeight: z.number().int(),
         letterSpacing: DimensionValue.optional(),
@@ -131,8 +101,6 @@ export const TokenValue = z.union([
   RefValue,
   ColorValue,
   DimensionValue,
-  FluidDimensionValue,
-  FontFamilyValue,
   TypographyValue,
   ShadowValue,
   BorderValue,
@@ -146,16 +114,6 @@ export type TokenValue = z.infer<typeof TokenValue>;
 /** Type guard: is this value an alias reference? */
 export function isRefValue(v: TokenValue): v is z.infer<typeof RefValue> {
   return typeof v === "object" && v !== null && "$ref" in v;
-}
-
-/** Type guard: is this value a fluid (clamp) dimension? */
-export function isFluidValue(v: TokenValue): v is z.infer<typeof FluidDimensionValue> {
-  return typeof v === "object" && v !== null && "fluid" in v;
-}
-
-/** Type guard: is this value a font-family stack? */
-export function isFontFamilyValue(v: TokenValue): v is z.infer<typeof FontFamilyValue> {
-  return typeof v === "object" && v !== null && "fontFamily" in v;
 }
 
 // --- token -----------------------------------------------------------------

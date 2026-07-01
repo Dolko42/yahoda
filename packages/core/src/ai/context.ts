@@ -5,10 +5,8 @@ import type {
   PatternNodeShape,
   TokenValue,
 } from "../schema/index.js";
-import { isFluidValue } from "../schema/index.js";
 import { evaluateComponentContrast } from "../a11y/index.js";
 import { resolveComponent, resolveTokenValue } from "../resolve/index.js";
-import { fluidToCss } from "../model/fluid.js";
 
 /**
  * Structured AI context — a pure projection of the model. The app does NOT generate
@@ -68,8 +66,6 @@ const byName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(
 
 function formatValue(v: TokenValue): string {
   if ("color" in v) return v.color;
-  if ("fontFamily" in v) return v.fontFamily;
-  if (isFluidValue(v)) return fluidToCss(v.fluid);
   if ("dimension" in v) return `${v.dimension}${v.unit}`;
   if ("opacity" in v) return String(v.opacity);
   if ("zIndex" in v) return String(v.zIndex);
@@ -77,10 +73,8 @@ function formatValue(v: TokenValue): string {
   if ("easing" in v) return Array.isArray(v.easing) ? `cubic-bezier(${v.easing.join(", ")})` : v.easing;
   if ("typography" in v) {
     const t = v.typography;
-    const family = typeof t.fontFamily === "string" ? t.fontFamily : "—";
-    const fs = t.fontSize;
-    const size = isFluidValue(fs) ? fluidToCss(fs.fluid) : "dimension" in fs ? `${fs.dimension}${fs.unit}` : "—";
-    return `${family} ${size}/${t.lineHeight} ${t.fontWeight}`;
+    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "—";
+    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
   }
   if ("shadow" in v) return `${v.shadow.length} shadow layer(s)`;
   if ("border" in v) return `${v.border.style} border`;

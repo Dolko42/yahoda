@@ -104,7 +104,6 @@ function humanize(key: string): string {
 const GROUP_OF: Record<TokenType, PropertyDescriptor["group"]> = {
   color: "Color",
   dimension: "Spacing",
-  fontFamily: "Typography",
   typography: "Typography",
   shadow: "Effect",
   border: "Effect",

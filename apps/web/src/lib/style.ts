@@ -4,13 +4,11 @@ import {
   type DesignSystem,
   type ResolveScope,
   type TokenValue,
-  fluidToCss,
-  isFluidValue,
   resolveComponent,
 } from "@yahoda/core";
 
 const dimToCss = (v: TokenValue): string | null =>
-  isFluidValue(v) ? fluidToCss(v.fluid) : "dimension" in v ? `${v.dimension}${v.unit}` : null;
+  "dimension" in v ? `${v.dimension}${v.unit}` : null;
 const colorToCss = (v: TokenValue): string | null => ("color" in v ? v.color : null);
 
 function shadowToCss(v: TokenValue): string | null {
@@ -88,9 +86,9 @@ export function componentStyle(
       case "typography":
         if ("typography" in v) {
           const t = v.typography;
-          if (typeof t.fontFamily === "string") style.fontFamily = t.fontFamily;
-          const size = dimToCss(t.fontSize);
-          if (size) style.fontSize = size;
+          style.fontFamily = t.fontFamily;
+          if ("dimension" in t.fontSize)
+            style.fontSize = `${t.fontSize.dimension}${t.fontSize.unit}`;
           style.lineHeight = t.lineHeight;
           style.fontWeight = t.fontWeight;
         }

@@ -30,14 +30,9 @@ describe("CSS export preserves aliasing + semantic names", () => {
     expect(css).toContain("--color-primary: var(--palette-blue-600);");
     expect(css).toContain("--palette-blue-600: #2448B8;");
   });
-  it("expands composite typography tokens, keeping family/size refs as var()", () => {
-    expect(css).toContain("--typography-heading-lg-font-family: var(--fontFamily-sans);");
-    expect(css).toContain("--typography-heading-lg-font-size: var(--fontSize-xl);");
+  it("expands composite typography tokens", () => {
+    expect(css).toContain("--typography-heading-lg-font-size: 2rem;");
     expect(css).toContain("--typography-heading-lg-font-weight: 700;");
-  });
-  it("emits font-family stacks and fluid sizes as clamp()", () => {
-    expect(css).toContain("--fontFamily-sans: Inter, system-ui, sans-serif;");
-    expect(css).toMatch(/--fontSize-xl: clamp\(2rem, [\d.]+rem \+ [\d.]+vw, 2\.5rem\);/);
   });
 });
 
