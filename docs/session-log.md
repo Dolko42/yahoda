@@ -20,6 +20,27 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-01 — Phase 3: Typography System
+
+- **Branch / commits:** main · `0ab908b` (typography feature) — **not pushed**
+- **State:** green — core **122 tests** pass; `pnpm -r typecheck` and `pnpm --filter @yahoda/web build` clean. Live UI round-trip verified via preview (category routing, fluid clamp, cascade re-resolution, family/size/style specimens, no console errors).
+- **Done this session:**
+  - **Font families are first-class**: new `fontFamily` TokenType (font stacks); semantic text styles reference a family + a `fontSize.*` scale primitive via **nested `$ref`** (base→semantic).
+  - **Fluid sizing**: new `FluidDimensionValue` → `fluidToCss()` emits deterministic `clamp()`. Seed `fontSize.xl` is fluid.
+  - Shared **`collectRefs`** nested-ref collector now feeds the dependency **graph** and **validator** (previously only top-level aliases were tracked — latent gap fixed).
+  - Exporters (css/tailwind/markdown/ai) emit families, clamp, and `var()` refs; snapshots + graph test updated.
+  - App: rich **TypographyEditor** (family picker · size scale/fixed/fluid toggle · weight · line-height · letter-spacing) with live clamp preview; Sidebar Typography grouping (Families/Sizes/Text styles) + 3 create actions; `TokenPreview` specimens for families/sizes/fluid.
+- **Next / open questions:**
+  - **Recipe editor** (component Properties → Typography property) was *not* re-verified live — the picker filters by `type === "typography"` so new styles should appear, but confirm.
+  - Supabase live verification **still deferred** (carried from Phase 2 — see below). New fluid/fontFamily values ride through the existing jsonb mapping unchanged.
+  - Component creation still a disabled placeholder; no multi-system switcher (unchanged).
+- **Gotchas / non-obvious context:**
+  - **Never run `pnpm --filter @yahoda/web build` while the preview `next dev` server is running** — it clobbers `.next` and the running app 404s its chunks (clicks silently do nothing). Stop the dev server or `rm -rf apps/web/.next` + restart. (Hit this exact trap this session.) Saved as a memory.
+  - `@yahoda/core` is consumed via **`dist/`** — rebuild core after edits.
+  - `fluidToCss` rounds to 4dp and assumes a 16px rem base — keep deterministic for golden snapshots.
+  - Typography `fontFamily`/`fontSize` are `string|$ref` / `dimension|fluid|$ref` unions — `isRefValue` can't take a bare string; guard with `typeof x === "string"` for family.
+  - The editor edits **`resolved.token`** (raw, refs intact) not `resolved.value` (nested-resolved), so the family/size pickers show the referenced token, not a flattened string.
+
 ## 2026-06-30 — Phase 2: Design System Engine & Persistence
 
 - **Branch / commits:** main · `67a4031`, `73a9a7a` (pushed)
