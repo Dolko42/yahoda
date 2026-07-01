@@ -93,6 +93,51 @@ export function makeToken(opts: {
   };
 }
 
+/** Prefix used for primitive color palette tokens (matches the seed convention). */
+export const PALETTE_PREFIX = "palette";
+
+/** Compose a primitive color token name from a family + step, e.g. `palette.blue.600`. */
+export function primitiveColorName(family: string, step: string): string {
+  const f = family.trim().toLowerCase();
+  const s = step.trim();
+  return s ? `${PALETTE_PREFIX}.${f}.${s}` : `${PALETTE_PREFIX}.${f}`;
+}
+
+/** Compose a semantic color token name from a role, e.g. `color.primary`. */
+export function semanticColorName(role: string): string {
+  return `color.${role.trim()}`;
+}
+
+/** Build a primitive color token (holds a raw hex). */
+export function makePrimitiveColor(opts: {
+  family: string;
+  step: string;
+  hex: string;
+}): Token {
+  return makeToken({
+    type: "color",
+    name: primitiveColorName(opts.family, opts.step),
+    tier: "primitive",
+    group: "Palette",
+    value: { color: opts.hex },
+  });
+}
+
+/** Build a semantic color token that references a primitive (or falls back to a raw hex). */
+export function makeSemanticColor(opts: {
+  role: string;
+  sourceId?: string;
+  hex?: string;
+}): Token {
+  return makeToken({
+    type: "color",
+    name: semanticColorName(opts.role),
+    tier: "semantic",
+    group: "Brand",
+    value: opts.sourceId ? { $ref: opts.sourceId } : { color: opts.hex ?? "#3B82F6" },
+  });
+}
+
 /** True if a dotted token name is syntactically valid and unique within the system. */
 export function validateTokenName(
   name: string,

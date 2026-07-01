@@ -6,6 +6,7 @@ import { useWorkspace } from "@/store/workspace";
 import { TokenSwatch } from "./edit/PropertyTokenPicker";
 import { makeToken, validateTokenName } from "@/lib/tokens";
 import { CATEGORIES, type CreateCfg, type TokenGroup } from "@/lib/categories";
+import { ColorsSidebar } from "./ColorsSidebar";
 
 /**
  * Toolbox-style system navigator. The active system category (Colors, Typography, …,
@@ -29,6 +30,9 @@ export function Sidebar() {
 
   const category = CATEGORIES.find((c) => c.id === active)!;
   const q = query.trim().toLowerCase();
+
+  // Colors get a dedicated navigator (grouped palettes + semantic list + typed creation).
+  const isColors = active === "colors";
 
   // The section tab bar drives `active`; clear per-category local UI when it changes.
   useEffect(() => {
@@ -64,6 +68,8 @@ export function Sidebar() {
     select({ kind: "token", id: token.id });
     resetCreate();
   };
+
+  if (isColors) return <ColorsSidebar />;
 
   return (
     <nav className="flex w-64 shrink-0 flex-col border-r border-line bg-surface">

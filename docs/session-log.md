@@ -20,6 +20,23 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-01 — Colors subsystem: primitive/semantic editor
+
+- **Branch / commits:** main · working tree only at handoff time — this `chore: session handoff` commit is the first for the work (will be pushed).
+- **State:** green — `@yahoda/core` rebuilt; **124 core tests** pass (13 new in `color/color.test.ts`), **2 web tests** pass, web typecheck (`tsc --noEmit`) clean. Verified live in preview: primitive/semantic grouped sidebar, typed creation form, scale generation, source rebind cascade — no console errors. (Screenshots time out in this env; verified via `preview_snapshot`/`preview_eval` DOM checks instead.)
+- **Done this session:**
+  - **Core:** new `packages/core/src/color/` module — `scale.ts` (`generateColorScale` + HSL helpers, deterministic, no AI) and `color.ts` (`isPrimitiveColor`/`isSemanticColor`, `parseColorName`, `getColorFamily`/`getColorStep`, `getPrimitiveSourceForSemantic`, `getSemanticUsagesOfPrimitive`, `groupPrimitiveColorsByFamily`, `resolveColorToken`). Exported from `src/index.ts`.
+  - **Web:** `ColorsSidebar.tsx` (primitives grouped into collapsible family palettes + separate semantic list w/ source labels + primitive/semantic typed creation form with stacked labeled fields); `edit/ColorTokenExtras.tsx` (semantic "Source primitive" binder + primitive family/shade + "Generate scale"); enriched color `TokenPreview` (source chain, family scale, dependent semantics). `Sidebar` branches to `ColorsSidebar` for the colors category. `tokens.ts` gained `makePrimitiveColor`/`makeSemanticColor`; store gained `createTokens` batch action.
+- **Next / open questions:**
+  - Possible follow-ups (not requested): OKLCH/contrast-aware scale, optional 50/950 steps, "regenerate & overwrite existing shades" (currently existing shades are always skipped).
+  - Colors category `creates`/`match` in `lib/categories.ts` are now dead for colors (ColorsSidebar owns creation/filtering) but harmless — left in place.
+- **Gotchas / non-obvious context:**
+  - **Semantic→primitive reference is the native `$ref` alias, NOT a metadata field.** Deliberately rejected `metadata.sourceTokenId` (would violate the one-model law). So resolution, cascade, dependency graph, exports, and Supabase persistence all work unchanged — no schema migration.
+  - **Rebinding a semantic uses `patchToken(id, {value:{$ref}})`, never `patchTokenValue`** — the latter redirects edits to the *resolved source* token, so it would mutate the primitive instead of the semantic's own ref.
+  - Primitive names follow the existing seed convention `palette.<family>.<shade>` (not `primitive.…` from the prompt) to avoid renaming seed tokens / breaking golden export snapshots. Family parsing is prefix-agnostic.
+  - **Scale monotonicity:** `generateColorScale` pins the ramp to the anchor's *own* lightness and interpolates toward near-white/near-black — keeps the anchor exact AND the L ramp monotonic even when the anchor is atypically dark/light for its step (a naive per-step lightness table breaks this; there's a test for it).
+  - After editing core you must **rebuild `@yahoda/core`** for the web app to see new exports (`pnpm --filter @yahoda/core build`).
+
 ## 2026-07-01 — Revert Phase 3 typography (to be redone as a new phase)
 
 - **Branch / commits:** main · (this commit) — user was unhappy with Phase 3 typography and wants to redo it fresh. **Phase 3 is preserved in history at `0ab908b`** — recover from there when redoing.

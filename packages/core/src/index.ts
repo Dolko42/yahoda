@@ -8,6 +8,7 @@
 export * from "./schema/index.js";
 export * from "./model/index.js";
 export * from "./resolve/index.js";
+export * from "./color/index.js";
 export * from "./graph/index.js";
 export * from "./a11y/index.js";
 export * from "./diff/index.js";

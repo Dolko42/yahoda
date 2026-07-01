@@ -77,6 +77,8 @@ interface WorkspaceState {
 
   // --- token CRUD ---
   createToken: (token: Token) => void;
+  /** Add several tokens at once (e.g. a generated color scale) in a single persist. */
+  createTokens: (tokens: Token[]) => void;
   /** Safe delete: if `reassignTo` is given, move references there first. */
   removeTokenSafely: (id: string, reassignTo?: string) => void;
 
@@ -140,6 +142,9 @@ export const useWorkspace = create<WorkspaceState>((set) => {
     // Add a token without changing selection — callers decide whether to navigate to it
     // (sidebar "+ New" selects it; inline create-and-assign keeps the component selected).
     createToken: (token) => set((s) => apply(coreAddToken(s.ds, token))),
+
+    createTokens: (tokens) =>
+      set((s) => apply(tokens.reduce((ds, t) => coreAddToken(ds, t), s.ds))),
 
     removeTokenSafely: (id, reassignTo) =>
       set((s) => {

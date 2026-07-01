@@ -4,10 +4,17 @@ import {
   type DesignSystem,
   type Token,
   contrastRatio,
+  getColorFamily,
+  getColorStep,
+  getPrimitiveSourceForSemantic,
+  getSemanticUsagesOfPrimitive,
+  isPrimitiveColor,
+  isSemanticColor,
   getDependents,
   resolveColor,
   resolveTokenValue,
 } from "@yahoda/core";
+import { useWorkspace } from "@/store/workspace";
 import { findComponent } from "@/lib/nodes";
 import { formatTokenValue } from "@/lib/format";
 import { ComponentElement } from "./ComponentElement";
@@ -56,6 +63,100 @@ function UsedByComponents({ ds, tokenId }: { ds: DesignSystem; tokenId: string }
   );
 }
 
+/** The primitive scale a semantic color binds to (or a note when it's a raw hex). */
+function SemanticSourcePreview({ ds, token }: { ds: DesignSystem; token: Token }) {
+  const select = useWorkspace((s) => s.select);
+  const source = getPrimitiveSourceForSemantic(ds, token.id);
+  if (!source) {
+    return (
+      <div className="rounded-lg border border-line bg-white px-4 py-3 text-[12px] text-faint">
+        Raw hex — this color has no primitive source.
+      </div>
+    );
+  }
+  const hex = resolveColor(ds, source.id) ?? "#000000";
+  return (
+    <section>
+      <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-muted">Source</h3>
+      <button
+        onClick={() => select({ kind: "token", id: source.id })}
+        className="flex items-center gap-3 rounded-lg border border-line bg-white px-4 py-3 hover:border-primary"
+      >
+        <span className="h-9 w-9 rounded-md border border-line" style={{ background: hex }} />
+        <span className="text-left">
+          <span className="block font-mono text-[13px] text-strong">{source.name}</span>
+          <span className="block font-mono text-[11px] text-faint">{hex}</span>
+        </span>
+      </button>
+    </section>
+  );
+}
+
+/** The full family scale for a primitive color, with the current shade marked. */
+function FamilyScalePreview({ ds, token }: { ds: DesignSystem; token: Token }) {
+  const select = useWorkspace((s) => s.select);
+  const family = getColorFamily(token);
+  if (!family) return null;
+  const shades = ds.tokens
+    .filter((t) => isPrimitiveColor(t) && getColorFamily(t) === family)
+    .sort((a, b) => (getColorStep(a) ?? Infinity) - (getColorStep(b) ?? Infinity));
+  if (shades.length <= 1) return null;
+  return (
+    <section>
+      <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-muted">
+        <span className="capitalize">{family}</span> scale
+      </h3>
+      <div className="flex flex-wrap gap-2">
+        {shades.map((t) => {
+          const hex = resolveColor(ds, t.id) ?? "#000000";
+          const current = t.id === token.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => select({ kind: "token", id: t.id })}
+              className={`flex flex-col items-center gap-1 rounded-lg border p-1.5 ${
+                current ? "border-primary" : "border-line hover:border-primary/60"
+              }`}
+            >
+              <span className="h-12 w-12 rounded-md border border-line" style={{ background: hex }} />
+              <span className="font-mono text-[10px] text-muted">{getColorStep(t) ?? "—"}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/** Semantic colors that resolve to this primitive. */
+function DependentSemantics({ ds, tokenId }: { ds: DesignSystem; tokenId: string }) {
+  const select = useWorkspace((s) => s.select);
+  const usages = getSemanticUsagesOfPrimitive(ds, tokenId);
+  if (usages.length === 0) return null;
+  return (
+    <section>
+      <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-muted">
+        Used by {usages.length} semantic color{usages.length === 1 ? "" : "s"}
+      </h3>
+      <div className="flex flex-wrap gap-2">
+        {usages.map((t) => {
+          const hex = resolveColor(ds, t.id) ?? "#000000";
+          return (
+            <button
+              key={t.id}
+              onClick={() => select({ kind: "token", id: t.id })}
+              className="flex items-center gap-2 rounded-lg border border-line bg-white px-3 py-2 hover:border-primary"
+            >
+              <span className="h-4 w-4 rounded-full border border-line" style={{ background: hex }} />
+              <span className="font-mono text-[12px] text-strong">{t.name}</span>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) {
   const resolved = resolveTokenValue(ds, token.id);
   const value = resolved.ok ? resolved.value : token.value;
@@ -82,6 +183,9 @@ export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) 
           </div>
         </div>
 
+        {isSemanticColor(token) && <SemanticSourcePreview ds={ds} token={token} />}
+        {isPrimitiveColor(token) && <FamilyScalePreview ds={ds} token={token} />}
+
         <section>
           <h3 className="mb-3 text-[12px] font-semibold uppercase tracking-wider text-muted">
             Contrast
@@ -93,6 +197,7 @@ export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) 
           </div>
         </section>
 
+        {isPrimitiveColor(token) && <DependentSemantics ds={ds} tokenId={token.id} />}
         <UsedByComponents ds={ds} tokenId={token.id} />
       </div>
     );

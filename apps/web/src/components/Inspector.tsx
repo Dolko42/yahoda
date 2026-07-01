@@ -18,6 +18,7 @@ import { countChanges } from "@/lib/diff";
 import { generateComponentCode, generateTokenCode } from "@/lib/code";
 import { EditRow, NumberField, SelectField, TextArea, TextField } from "./edit/Controls";
 import { TokenValueEditor } from "./edit/TokenValueEditor";
+import { ColorTokenExtras } from "./edit/ColorTokenExtras";
 import { AiRulesEditor } from "./edit/AiRulesEditor";
 import { DeleteTokenButton } from "./edit/DeleteTokenButton";
 import { RecipeEditor } from "./edit/RecipeEditor";
@@ -96,6 +97,7 @@ function PropertiesTab({ ds, sel }: { ds: DesignSystem; sel: ResolvedNode }) {
         <Field label="Tier">{t.tier}</Field>
         {t.group && <Field label="Group">{t.group}</Field>}
         <EditRow label="Value"><TokenValueEditor ds={ds} token={t} /></EditRow>
+        {t.type === "color" && <ColorTokenExtras ds={ds} token={t} />}
         <EditRow label="Usage">
           <TextField value={t.usage ?? ""} placeholder="When to use this token…"
             onCommit={(v) => patchToken(t.id, { usage: v })} />
