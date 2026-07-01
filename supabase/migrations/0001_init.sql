@@ -108,13 +108,18 @@ alter table public.tokens         enable row level security;
 alter table public.components     enable row level security;
 alter table public.commits        enable row level security;
 
+-- `drop policy if exists` before each create keeps this migration re-runnable (Postgres
+-- has no `create policy if not exists`).
+drop policy if exists "own profile" on public.profiles;
 create policy "own profile" on public.profiles
   for all using (id = auth.uid()) with check (id = auth.uid());
 
+drop policy if exists "own design systems" on public.design_systems;
 create policy "own design systems" on public.design_systems
   for all using (owner_id = auth.uid()) with check (owner_id = auth.uid());
 
 -- child tables: owned via their design system
+drop policy if exists "own tokens" on public.tokens;
 create policy "own tokens" on public.tokens
   for all using (
     design_system_id in (select id from public.design_systems where owner_id = auth.uid())
@@ -122,6 +127,7 @@ create policy "own tokens" on public.tokens
     design_system_id in (select id from public.design_systems where owner_id = auth.uid())
   );
 
+drop policy if exists "own components" on public.components;
 create policy "own components" on public.components
   for all using (
     design_system_id in (select id from public.design_systems where owner_id = auth.uid())
@@ -129,6 +135,7 @@ create policy "own components" on public.components
     design_system_id in (select id from public.design_systems where owner_id = auth.uid())
   );
 
+drop policy if exists "own commits" on public.commits;
 create policy "own commits" on public.commits
   for all using (
     design_system_id in (select id from public.design_systems where owner_id = auth.uid())

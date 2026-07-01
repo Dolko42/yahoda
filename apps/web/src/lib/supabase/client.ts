@@ -9,7 +9,10 @@ import { type SupabaseClient, createClient } from "@supabase/supabase-js";
  */
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// Accept the new-style publishable key (sb_publishable_...) or the legacy JWT anon key —
+// either works as the client's public key. Next inlines both static references at build.
+const anonKey =
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
 let cached: SupabaseClient | null | undefined;
 

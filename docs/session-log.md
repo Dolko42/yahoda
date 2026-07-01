@@ -20,6 +20,25 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-01 — Live Supabase connection (Phase 2 finalization)
+
+- **Branch / commits:** main · `<this commit>` — **pushed**
+- **State:** green — `pnpm -r typecheck` clean; **124 tests** pass (122 core + 2 new web mapping). Live DB **connected and verified**: all 4 tables reachable, publishable key valid, RLS active (unauth → `200 []`), email auth enabled. The authenticated round-trip (sign in → seed push → cloud load) is **not yet human-verified** — email-gated, left for the user.
+- **Done this session:**
+  - Rebuilt stale core `dist/` — the Phase-3 pull left `@yahoda/core` missing `fluidToCss`/`isFluidValue`/`fontFamily`, red-typechecking the web app until rebuilt.
+  - **Cloud serializer now round-trip-tested**: `apps/web/src/lib/supabase/mapping.test.ts` JSON-clones the jsonb payloads (simulating the wire) and re-`parseDesignSystem`s the seed. Wired **vitest into `apps/web`** (`test` script + `vitest.config.ts`) so CI covers it.
+  - Fixed first-sign-in seeding in `Workspace.tsx`: `loadWorkspace()` masked an empty cloud with the local copy, so `pushToCloud` never ran and a new account stayed empty until the first edit. Now checks the cloud directly.
+  - `client.ts` accepts the new `sb_publishable_…` key (via `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`) as well as the legacy anon JWT.
+  - Made `0001_init.sql` re-runnable (`drop policy if exists` before each `create policy`).
+  - Real project provisioned by user; creds in gitignored `apps/web/.env.local`; `.env.example` restored to placeholders.
+- **Next / open questions:**
+  - **Do the human auth round-trip**: sign in via magic link → confirm `design_systems` (1 row) + `tokens` (~35) populate → reload loads from cloud → edit mirrors within ~1s. If the user signs in *inside the preview browser*, the next session can read the authed session and verify the rows.
+  - Still single design system per user, last-write-wins, no multi-system switcher; component creation still a disabled placeholder (unchanged). Recipe-editor Typography property still not re-verified live (carried from Phase 3).
+- **Gotchas / non-obvious context:**
+  - **`NEXT_PUBLIC_*` env is inlined at dev-server start** — after editing `.env.local` you must restart `next dev` (stop + `preview_start`), not just reload. `.env.local` is gitignored (`.gitignore:19`).
+  - Supabase's new API keys are `sb_publishable_…`, not the legacy JWT — both work as the client's public key; `client.ts` reads either var name.
+  - Same trap as Phase 3: `dist/` is gitignored, so **rebuild `@yahoda/core` after every pull** or the web app won't see new exports.
+
 ## 2026-07-01 — Phase 3: Typography System
 
 - **Branch / commits:** main · `0ab908b` (typography feature) — **not pushed**

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useWorkspace } from "@/store/workspace";
 import { loadWorkspace, pushToCloud } from "@/lib/workspaceRepo";
+import { loadFromCloud } from "@/lib/supabase/repository";
 import { getSupabase } from "@/lib/supabase/client";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
@@ -29,9 +30,15 @@ export function Workspace() {
     if (!sb) return;
     const { data } = sb.auth.onAuthStateChange(async (event) => {
       if (event === "SIGNED_IN") {
-        const cloud = await loadWorkspace();
-        if (cloud) hydrate(cloud);
-        else await pushToCloud(useWorkspace.getState().ds); // seed empty account
+        // Check the cloud directly (not loadWorkspace, which masks an empty cloud with the
+        // local copy) so a brand-new account is seeded from the current working set.
+        try {
+          const cloud = await loadFromCloud();
+          if (cloud) hydrate(cloud);
+          else await pushToCloud(useWorkspace.getState().ds);
+        } catch (e) {
+          console.warn("[yahoda] cloud sync on sign-in failed — keeping local copy", e);
+        }
       }
     });
     return () => data.subscription.unsubscribe();
