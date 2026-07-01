@@ -22,7 +22,7 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 
 ## 2026-07-01 — Live Supabase connection (Phase 2 finalization)
 
-- **Branch / commits:** main · `<this commit>` — **pushed**
+- **Branch / commits:** main · `6cb71f4` — **pushed**
 - **State:** green — `pnpm -r typecheck` clean; **124 tests** pass (122 core + 2 new web mapping). Live DB **connected and verified**: all 4 tables reachable, publishable key valid, RLS active (unauth → `200 []`), email auth enabled. The authenticated round-trip (sign in → seed push → cloud load) is **not yet human-verified** — email-gated, left for the user.
 - **Done this session:**
   - Rebuilt stale core `dist/` — the Phase-3 pull left `@yahoda/core` missing `fluidToCss`/`isFluidValue`/`fontFamily`, red-typechecking the web app until rebuilt.
