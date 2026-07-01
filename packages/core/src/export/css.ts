@@ -1,5 +1,6 @@
 import type { DesignSystem, Token, TokenValue } from "../schema/index.js";
-import { isRefValue } from "../schema/index.js";
+import { isFluidValue, isRefValue } from "../schema/index.js";
+import { fluidToCss } from "../model/fluid.js";
 import { dashName, header, sortedTokens, tokenNameMap } from "./util.js";
 
 /**
@@ -19,8 +20,14 @@ function colorOrVar(v: TokenValue, names: Map<string, string>): string {
 
 function dimOrVar(v: TokenValue, names: Map<string, string>): string {
   if (isRefValue(v)) return `var(--${dashName(names.get(v.$ref) ?? v.$ref)})`;
+  if (isFluidValue(v)) return fluidToCss(v.fluid);
   if ("dimension" in v) return px(v);
   return "0";
+}
+
+/** A typography font-family slot: a var() when it aliases a family token, else the literal. */
+function familyOrVar(v: string | { $ref: string }, names: Map<string, string>): string {
+  return typeof v === "string" ? v : `var(--${dashName(names.get(v.$ref) ?? v.$ref)})`;
 }
 
 function cssLinesFor(t: Token, names: Map<string, string>): string[] {
@@ -32,6 +39,8 @@ function cssLinesFor(t: Token, names: Map<string, string>): string[] {
     return [`--${base}: var(--${target});`];
   }
   if ("color" in v) return [`--${base}: ${v.color};`];
+  if ("fontFamily" in v) return [`--${base}: ${v.fontFamily};`];
+  if (isFluidValue(v)) return [`--${base}: ${fluidToCss(v.fluid)};`];
   if ("dimension" in v) return [`--${base}: ${px(v)};`];
   if ("opacity" in v) return [`--${base}: ${v.opacity};`];
   if ("zIndex" in v) return [`--${base}: ${v.zIndex};`];
@@ -43,7 +52,7 @@ function cssLinesFor(t: Token, names: Map<string, string>): string[] {
   if ("typography" in v) {
     const ty = v.typography;
     const lines = [
-      `--${base}-font-family: ${ty.fontFamily};`,
+      `--${base}-font-family: ${familyOrVar(ty.fontFamily, names)};`,
       `--${base}-font-size: ${dimOrVar(ty.fontSize, names)};`,
       `--${base}-line-height: ${ty.lineHeight};`,
       `--${base}-font-weight: ${ty.fontWeight};`,

@@ -59,6 +59,19 @@ describe("dependency graph", () => {
     expect(radius).toContain("p.authForm");
   });
 
+  it("tracks nested typography refs: what uses fontFamily.sans / fontSize.xl?", () => {
+    const ds = createSeedDesignSystem();
+    // every text style references the sans family primitive
+    expect(ids(getDependents(ds, "t.fontFamily.sans"))).toEqual([
+      "t.type.body.md",
+      "t.type.heading.lg",
+      "t.type.label.sm",
+    ]);
+    // only the heading style references the fluid xl size — and its blast radius
+    // reaches the components that use that style.
+    expect(ids(getDependents(ds, "t.fontSize.xl"))).toEqual(["t.type.heading.lg"]);
+  });
+
   it("returns empty for a node nothing depends on", () => {
     const ds = createSeedDesignSystem();
     expect(getDependents(ds, "p.authForm")).toEqual([]);

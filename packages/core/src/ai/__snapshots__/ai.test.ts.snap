@@ -3,7 +3,7 @@
 exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 "# AI context — Acme UI
 
-> schemaVersion 1.0.0 · commit draft · hash h_b41bf793
+> schemaVersion 1.0.0 · commit draft · hash h_d6d33d43
 > Use only the components, tokens, and rules below. Do not invent components or values.
 
 ## Tokens
@@ -20,6 +20,12 @@ exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 | \`color.transparent\` | color | semantic | transparent | No fill — e.g. ghost button background. |
 | \`duration.fast\` | duration | semantic | 150ms | Hover/press micro-interactions. |
 | \`easing.standard\` | easing | semantic | cubic-bezier(0.2, 0, 0, 1) | Default easing for UI transitions. |
+| \`fontFamily.mono\` | fontFamily | primitive | 'JetBrains Mono', ui-monospace, monospace | Code, tokens, and tabular figures. |
+| \`fontFamily.sans\` | fontFamily | primitive | Inter, system-ui, sans-serif | Default UI and body typeface. |
+| \`fontSize.lg\` | dimension | primitive | 1.25rem |  |
+| \`fontSize.md\` | dimension | primitive | 1rem |  |
+| \`fontSize.sm\` | dimension | primitive | 0.875rem |  |
+| \`fontSize.xl\` | dimension | primitive | clamp(2rem, 1.8261rem + 0.8696vw, 2.5rem) | Display/heading size that scales with the viewport. |
 | \`palette.blue.600\` | color | primitive | #2448B8 |  |
 | \`palette.blue.700\` | color | primitive | #1E3FA0 |  |
 | \`palette.red.600\` | color | primitive | #C0341D |  |
@@ -36,9 +42,9 @@ exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 | \`spacing.3\` | dimension | semantic | 12px |  |
 | \`spacing.4\` | dimension | semantic | 16px |  |
 | \`spacing.6\` | dimension | semantic | 24px |  |
-| \`typography.body.md\` | typography | semantic | Inter 1rem/1.5 400 | Default body copy. |
-| \`typography.heading.lg\` | typography | semantic | Inter 2rem/1.2 700 | Page and section headings. |
-| \`typography.label.sm\` | typography | semantic | Inter 0.875rem/1.4 500 | Form labels and button text. |
+| \`typography.body.md\` | typography | semantic | Inter, system-ui, sans-serif 1rem/1.5 400 | Default body copy. |
+| \`typography.heading.lg\` | typography | semantic | Inter, system-ui, sans-serif clamp(2rem, 1.8261rem + 0.8696vw, 2.5rem)/1.2 700 | Page and section headings. |
+| \`typography.label.sm\` | typography | semantic | Inter, system-ui, sans-serif 0.875rem/1.4 500 | Form labels and button text. |
 
 ## Components
 

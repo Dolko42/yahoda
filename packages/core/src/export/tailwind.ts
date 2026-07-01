@@ -1,5 +1,6 @@
 import type { DesignSystem, TokenValue } from "../schema/index.js";
-import { isRefValue } from "../schema/index.js";
+import { isFluidValue, isRefValue } from "../schema/index.js";
+import { fluidToCss } from "../model/fluid.js";
 import { dashName, header, sortedTokens, tokenNameMap } from "./util.js";
 
 /**
@@ -15,6 +16,7 @@ const varRef = (name: string): string => `var(--${dashName(name)})`;
 
 function sizeOf(v: TokenValue, names: Map<string, string>): string {
   if (isRefValue(v)) return `var(--${dashName(names.get(v.$ref) ?? v.$ref)})`;
+  if (isFluidValue(v)) return fluidToCss(v.fluid);
   if ("dimension" in v) return `${v.dimension}${v.unit}`;
   return "1rem";
 }
@@ -26,7 +28,8 @@ export function exportTailwind(ds: DesignSystem): string {
   const colors: Record<string, string> = {};
   const borderRadius: Record<string, string> = {};
   const spacing: Record<string, string> = {};
-  const fontSize: Record<string, [string, { lineHeight: string; fontWeight: string }]> = {};
+  const fontFamily: Record<string, string> = {};
+  const fontSize: Record<string, string | [string, { lineHeight: string; fontWeight: string }]> = {};
   const boxShadow: Record<string, string> = {};
   const transitionDuration: Record<string, string> = {};
   const transitionTimingFunction: Record<string, string> = {};
@@ -38,7 +41,11 @@ export function exportTailwind(ds: DesignSystem): string {
         break;
       case "dimension":
         if (t.name.startsWith("radius.")) borderRadius[strip(t.name, "radius")] = varRef(t.name);
+        else if (t.name.startsWith("fontSize.")) fontSize[strip(t.name, "fontSize")] = varRef(t.name);
         else if (t.name.startsWith("spacing.")) spacing[strip(t.name, "spacing")] = varRef(t.name);
+        break;
+      case "fontFamily":
+        fontFamily[strip(t.name, "fontFamily")] = varRef(t.name);
         break;
       case "typography": {
         if ("typography" in t.value) {
@@ -71,6 +78,7 @@ export function exportTailwind(ds: DesignSystem): string {
   put("colors", colors);
   put("borderRadius", borderRadius);
   put("spacing", spacing);
+  put("fontFamily", fontFamily);
   put("fontSize", fontSize);
   put("boxShadow", boxShadow);
   put("transitionDuration", transitionDuration);

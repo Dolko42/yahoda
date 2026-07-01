@@ -79,17 +79,37 @@ const tokens: Token[] = [
   { id: "t.spacing.6", name: "spacing.6", type: "dimension", tier: "semantic",
     value: { dimension: 24, unit: "px" }, group: "Spacing", meta },
 
-  // typography
+  // typography — font family primitives (first-class font stacks)
+  { id: "t.fontFamily.sans", name: "fontFamily.sans", type: "fontFamily", tier: "primitive",
+    value: { fontFamily: "Inter, system-ui, sans-serif" },
+    usage: "Default UI and body typeface.", group: "Font family", meta },
+  { id: "t.fontFamily.mono", name: "fontFamily.mono", type: "fontFamily", tier: "primitive",
+    value: { fontFamily: "'JetBrains Mono', ui-monospace, monospace" },
+    usage: "Code, tokens, and tabular figures.", group: "Font family", meta },
+
+  // typography — font size scale primitives (base ramp; xl is fluid → clamp())
+  { id: "t.fontSize.sm", name: "fontSize.sm", type: "dimension", tier: "primitive",
+    value: { dimension: 0.875, unit: "rem" }, group: "Font size", meta },
+  { id: "t.fontSize.md", name: "fontSize.md", type: "dimension", tier: "primitive",
+    value: { dimension: 1, unit: "rem" }, group: "Font size", meta },
+  { id: "t.fontSize.lg", name: "fontSize.lg", type: "dimension", tier: "primitive",
+    value: { dimension: 1.25, unit: "rem" }, group: "Font size", meta },
+  { id: "t.fontSize.xl", name: "fontSize.xl", type: "dimension", tier: "primitive",
+    value: { fluid: { min: { dimension: 2, unit: "rem" }, max: { dimension: 2.5, unit: "rem" },
+      minViewport: { dimension: 320, unit: "px" }, maxViewport: { dimension: 1240, unit: "px" } } },
+    usage: "Display/heading size that scales with the viewport.", group: "Font size", meta },
+
+  // typography — semantic text styles (reference the family + size primitives)
   { id: "t.type.heading.lg", name: "typography.heading.lg", type: "typography", tier: "semantic",
-    value: { typography: { fontFamily: "Inter", fontSize: { dimension: 2, unit: "rem" },
+    value: { typography: { fontFamily: { $ref: "t.fontFamily.sans" }, fontSize: { $ref: "t.fontSize.xl" },
       lineHeight: 1.2, fontWeight: 700 } }, usage: "Page and section headings.",
     group: "Typography", meta },
   { id: "t.type.body.md", name: "typography.body.md", type: "typography", tier: "semantic",
-    value: { typography: { fontFamily: "Inter", fontSize: { dimension: 1, unit: "rem" },
+    value: { typography: { fontFamily: { $ref: "t.fontFamily.sans" }, fontSize: { $ref: "t.fontSize.md" },
       lineHeight: 1.5, fontWeight: 400 } }, usage: "Default body copy.",
     group: "Typography", meta },
   { id: "t.type.label.sm", name: "typography.label.sm", type: "typography", tier: "semantic",
-    value: { typography: { fontFamily: "Inter", fontSize: { dimension: 0.875, unit: "rem" },
+    value: { typography: { fontFamily: { $ref: "t.fontFamily.sans" }, fontSize: { $ref: "t.fontSize.sm" },
       lineHeight: 1.4, fontWeight: 500 } }, usage: "Form labels and button text.",
     group: "Typography", meta },
 

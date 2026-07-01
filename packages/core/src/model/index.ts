@@ -1,4 +1,5 @@
 export * from "./parse.js";
+export * from "./fluid.js";
 export * from "./validate.js";
 export * from "./crud.js";
 export * from "./recipe.js";

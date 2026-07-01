@@ -13,6 +13,8 @@ export function defaultTokenValue(type: TokenType): TokenValue {
       return { color: "#3B82F6" };
     case "dimension":
       return { dimension: 8, unit: "px" };
+    case "fontFamily":
+      return { fontFamily: "Inter, system-ui, sans-serif" };
     case "typography":
       return {
         typography: {
@@ -56,6 +58,8 @@ export function defaultNamePrefix(type: TokenType): string {
       return "color";
     case "dimension":
       return "spacing";
+    case "fontFamily":
+      return "fontFamily";
     case "typography":
       return "typography";
     case "shadow":

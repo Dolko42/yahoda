@@ -1,16 +1,25 @@
-import { type TokenValue, isRefValue } from "@yahoda/core";
+import { type TokenValue, isFluidValue, isRefValue } from "@yahoda/core";
+
+/** Compact string for a typography font-size slot (dimension, fluid range, or ref). */
+function sizeLabel(fs: TokenValue): string {
+  if (isRefValue(fs)) return `→${fs.$ref}`;
+  if (isFluidValue(fs)) return `${fs.fluid.min.dimension}${fs.fluid.min.unit}→${fs.fluid.max.dimension}${fs.fluid.max.unit}`;
+  if ("dimension" in fs) return `${fs.dimension}${fs.unit}`;
+  return "—";
+}
 
 /** Format a token value (raw or resolved) for compact display in the inspector. */
 export function formatTokenValue(value: TokenValue): string {
   if (isRefValue(value)) return `→ ${value.$ref}`;
   if ("color" in value) return value.color;
+  if ("fontFamily" in value) return value.fontFamily;
+  if (isFluidValue(value))
+    return `${value.fluid.min.dimension}${value.fluid.min.unit}→${value.fluid.max.dimension}${value.fluid.max.unit} (fluid)`;
   if ("dimension" in value) return `${value.dimension}${value.unit}`;
   if ("typography" in value) {
     const t = value.typography;
-    const size = isRefValue(t.fontSize)
-      ? `→${t.fontSize.$ref}`
-      : `${t.fontSize.dimension}${t.fontSize.unit}`;
-    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
+    const family = typeof t.fontFamily === "string" ? t.fontFamily : `→${t.fontFamily.$ref}`;
+    return `${family} ${sizeLabel(t.fontSize)}/${t.lineHeight} ${t.fontWeight}`;
   }
   if ("shadow" in value) {
     return value.shadow

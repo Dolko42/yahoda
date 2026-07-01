@@ -21,29 +21,60 @@ type CategoryId =
   | "motion"
   | "components";
 
+interface CreateCfg {
+  type: TokenType;
+  namePrefix: string;
+  group: string;
+  /** button label, e.g. "Font family" */
+  label: string;
+}
+
+interface TokenGroup {
+  label: string;
+  filter: (t: Token) => boolean;
+}
+
 interface Category {
   id: CategoryId;
   label: string;
-  /** token categories carry create config; component category does not */
-  create?: { type: TokenType; namePrefix: string; group: string };
+  /** one or more "+ New" actions; empty for the component category */
+  creates: CreateCfg[];
   match?: (t: Token) => boolean;
+  /** optional sub-grouping of the list (falls back to tier/flat) */
+  groups?: TokenGroup[];
 }
 
+const isFontSize = (t: Token) => t.type === "dimension" && t.name.startsWith("fontSize");
+
 const CATEGORIES: Category[] = [
-  { id: "colors", label: "Colors", create: { type: "color", namePrefix: "color", group: "Brand" },
+  { id: "colors", label: "Colors",
+    creates: [{ type: "color", namePrefix: "color", group: "Brand", label: "Color" }],
     match: (t) => t.type === "color" },
   { id: "typography", label: "Typography",
-    create: { type: "typography", namePrefix: "typography", group: "Typography" },
-    match: (t) => t.type === "typography" },
-  { id: "spacing", label: "Spacing", create: { type: "dimension", namePrefix: "spacing", group: "Spacing" },
-    match: (t) => t.type === "dimension" && !t.name.startsWith("radius") },
-  { id: "radius", label: "Radius", create: { type: "dimension", namePrefix: "radius", group: "Radius" },
+    creates: [
+      { type: "fontFamily", namePrefix: "fontFamily", group: "Font family", label: "Font family" },
+      { type: "dimension", namePrefix: "fontSize", group: "Font size", label: "Font size" },
+      { type: "typography", namePrefix: "typography", group: "Typography", label: "Text style" },
+    ],
+    match: (t) => t.type === "typography" || t.type === "fontFamily" || isFontSize(t),
+    groups: [
+      { label: "Font families", filter: (t) => t.type === "fontFamily" },
+      { label: "Sizes", filter: isFontSize },
+      { label: "Text styles", filter: (t) => t.type === "typography" },
+    ] },
+  { id: "spacing", label: "Spacing",
+    creates: [{ type: "dimension", namePrefix: "spacing", group: "Spacing", label: "Spacing" }],
+    match: (t) => t.type === "dimension" && !t.name.startsWith("radius") && !isFontSize(t) },
+  { id: "radius", label: "Radius",
+    creates: [{ type: "dimension", namePrefix: "radius", group: "Radius", label: "Radius" }],
     match: (t) => t.type === "dimension" && t.name.startsWith("radius") },
-  { id: "effects", label: "Effects", create: { type: "shadow", namePrefix: "shadow", group: "Elevation" },
+  { id: "effects", label: "Effects",
+    creates: [{ type: "shadow", namePrefix: "shadow", group: "Elevation", label: "Shadow" }],
     match: (t) => ["shadow", "border", "opacity"].includes(t.type) },
-  { id: "motion", label: "Motion", create: { type: "duration", namePrefix: "duration", group: "Motion" },
+  { id: "motion", label: "Motion",
+    creates: [{ type: "duration", namePrefix: "duration", group: "Motion", label: "Duration" }],
     match: (t) => ["duration", "easing"].includes(t.type) },
-  { id: "components", label: "Components" },
+  { id: "components", label: "Components", creates: [] },
 ];
 
 const TIERS: Token["tier"][] = ["primitive", "semantic", "component"];
@@ -56,7 +87,7 @@ export function Sidebar() {
 
   const [active, setActive] = useState<CategoryId>("colors");
   const [query, setQuery] = useState("");
-  const [creating, setCreating] = useState(false);
+  const [createCfg, setCreateCfg] = useState<CreateCfg | null>(null);
   const [newName, setNewName] = useState("");
 
   const category = CATEGORIES.find((c) => c.id === active)!;
@@ -70,16 +101,20 @@ export function Sidebar() {
   const filteredComponents = ds.components.filter((c) => !q || c.name.toLowerCase().includes(q));
 
   const resetCreate = () => {
-    setCreating(false);
+    setCreateCfg(null);
     setNewName("");
   };
-  const nameError = creating && category.create ? validateTokenName(newName, ds.tokens) : null;
+  const beginCreate = (cfg: CreateCfg) => {
+    setCreateCfg(cfg);
+    setNewName(`${cfg.namePrefix}.`);
+  };
+  const nameError = createCfg ? validateTokenName(newName, ds.tokens) : null;
   const submitCreate = () => {
-    if (!category.create || nameError) return;
+    if (!createCfg || nameError) return;
     const token = makeToken({
-      type: category.create.type,
+      type: createCfg.type,
       name: newName.trim(),
-      group: category.create.group,
+      group: createCfg.group,
     });
     createToken(token);
     select({ kind: "token", id: token.id });
@@ -129,27 +164,14 @@ export function Sidebar() {
             tokens={filteredTokens}
             ds={ds}
             groupByTier={category.id === "colors"}
+            groups={category.groups}
             selectedId={selection?.kind === "token" ? selection.id : null}
             onSelect={(id) => select({ kind: "token", id })}
           />
         )}
-
-        {/* typography future placeholders */}
-        {category.id === "typography" && (
-          <div className="mt-4 space-y-1 border-t border-line/60 pt-3">
-            <div className="px-2 text-[10px] font-semibold uppercase tracking-wider text-faint">
-              Coming soon
-            </div>
-            {["Font families", "Base styles", "Semantic styles"].map((label) => (
-              <div key={label} className="cursor-not-allowed px-2 py-1.5 text-[13px] text-faint">
-                {label}
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
-      {/* + New action */}
+      {/* + New action(s) */}
       <div className="border-t border-line p-2">
         {category.id === "components" ? (
           <button
@@ -159,8 +181,11 @@ export function Sidebar() {
           >
             + New Component
           </button>
-        ) : creating ? (
+        ) : createCfg ? (
           <div className="space-y-1.5">
+            <div className="px-1 text-[10px] uppercase tracking-wide text-faint">
+              New {createCfg.label.toLowerCase()}
+            </div>
             <input
               autoFocus
               value={newName}
@@ -169,7 +194,7 @@ export function Sidebar() {
                 if (e.key === "Enter") submitCreate();
                 if (e.key === "Escape") resetCreate();
               }}
-              placeholder={`${category.create?.namePrefix}.new`}
+              placeholder={`${createCfg.namePrefix}.new`}
               className="w-full rounded-md border border-line bg-white px-2 py-1 font-mono text-[12px] text-strong outline-none focus:border-primary"
             />
             {nameError && <div className="text-[11px] text-red-600">{nameError}</div>}
@@ -190,15 +215,17 @@ export function Sidebar() {
             </div>
           </div>
         ) : (
-          <button
-            onClick={() => {
-              setCreating(true);
-              setNewName(`${category.create?.namePrefix}.`);
-            }}
-            className="w-full rounded-md px-2 py-1.5 text-left text-[13px] text-primary hover:bg-page"
-          >
-            + New {category.label.replace(/s$/, "")}
-          </button>
+          <div className="flex flex-col gap-0.5">
+            {category.creates.map((cfg) => (
+              <button
+                key={cfg.label}
+                onClick={() => beginCreate(cfg)}
+                className="w-full rounded-md px-2 py-1.5 text-left text-[13px] text-primary hover:bg-page"
+              >
+                + New {cfg.label.toLowerCase()}
+              </button>
+            ))}
+          </div>
         )}
       </div>
     </nav>
@@ -209,12 +236,14 @@ function TokenList({
   tokens,
   ds,
   groupByTier,
+  groups,
   selectedId,
   onSelect,
 }: {
   tokens: Token[];
   ds: DesignSystem;
   groupByTier: boolean;
+  groups?: TokenGroup[];
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
@@ -239,6 +268,29 @@ function TokenList({
       </li>
     );
   };
+
+  if (groups) {
+    return (
+      <div className="space-y-3">
+        {groups.map((g) => {
+          const items = tokens.filter(g.filter).sort((a, b) => a.name.localeCompare(b.name));
+          if (items.length === 0) return null;
+          return (
+            <div key={g.label}>
+              <div className="px-2 pb-0.5 text-[10px] font-semibold uppercase tracking-wider text-faint">
+                {g.label}
+              </div>
+              <ul className="space-y-0.5">
+                {items.map((t) => (
+                  <Row key={t.id} t={t} />
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   if (!groupByTier) {
     return (

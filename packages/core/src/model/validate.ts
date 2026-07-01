@@ -176,6 +176,45 @@ export function validateInvariants(ds: DesignSystem): ValidationReport {
     return cur?.type;
   };
 
+  // nested composite refs (typography fontFamily/fontSize, shadow/border) — same dangling
+  // and type-agreement rules as top-level aliases, but per slot.
+  const nestedSlots = (t: Token): { ref: string; expect: TokenType }[] => {
+    const out: { ref: string; expect: TokenType }[] = [];
+    const add = (v: unknown, expect: TokenType) => {
+      if (v !== null && typeof v === "object" && "$ref" in v) {
+        out.push({ ref: (v as { $ref: string }).$ref, expect });
+      }
+    };
+    const val = t.value;
+    if ("typography" in val) {
+      add(val.typography.fontFamily, "fontFamily");
+      add(val.typography.fontSize, "dimension");
+    } else if ("shadow" in val) {
+      for (const l of val.shadow) add(l.color, "color");
+    } else if ("border" in val) {
+      add(val.border.width, "dimension");
+      add(val.border.color, "color");
+    }
+    return out;
+  };
+  for (const t of ds.tokens) {
+    if (isRefValue(t.value)) continue; // top-level refs handled above
+    for (const { ref, expect } of nestedSlots(t)) {
+      if (!tokenExists(ref)) {
+        err("DANGLING_REF", `Token "${t.name}" references missing token "${ref}"`, t.id);
+      } else {
+        const actual = resolvedType(ref);
+        if (actual && actual !== expect) {
+          err(
+            "TYPE_MISMATCH",
+            `Token "${t.name}" references "${tokensById.get(ref)!.name}" (${actual}) where a ${expect} token is required`,
+            t.id,
+          );
+        }
+      }
+    }
+  }
+
   // --- invariants 5-7: components -------------------------------------------
   for (const c of ds.components) {
     for (const b of c.bindings) {

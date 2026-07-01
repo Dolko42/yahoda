@@ -3,14 +3,26 @@
 import {
   type DesignSystem,
   type Token,
+  type TokenValue,
   contrastRatio,
+  fluidToCss,
   getDependents,
+  isFluidValue,
   resolveColor,
   resolveTokenValue,
 } from "@yahoda/core";
 import { findComponent } from "@/lib/nodes";
 import { formatTokenValue } from "@/lib/format";
 import { ComponentElement } from "./ComponentElement";
+
+const PANGRAM = "The quick brown fox jumps over the lazy dog";
+
+/** A CSS font-size string from a resolved size value (fixed dimension or fluid clamp). */
+function cssSize(v: TokenValue, fallback = "1rem"): string {
+  if (isFluidValue(v)) return fluidToCss(v.fluid);
+  if ("dimension" in v) return `${v.dimension}${v.unit}`;
+  return fallback;
+}
 
 function ContrastBadge({ fg, bg, label }: { fg: string; bg: string; label: string }) {
   const ratio = contrastRatio(fg, bg);
@@ -98,6 +110,46 @@ export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) 
     );
   }
 
+  // ---- font family ----
+  if (token.type === "fontFamily" && "fontFamily" in value) {
+    const stack = value.fontFamily;
+    return (
+      <div className="space-y-8">
+        <div className="font-mono text-[13px] text-faint">{stack}</div>
+        <div className="ds-scope space-y-4 rounded-xl bg-white p-8 shadow-app-1" style={{ fontFamily: stack }}>
+          <div style={{ fontSize: "2.25rem", fontWeight: 700 }}>{PANGRAM}</div>
+          {([400, 500, 600, 700] as const).map((w) => (
+            <div key={w} className="flex items-baseline gap-4">
+              <span className="w-10 shrink-0 font-mono text-[11px] text-faint">{w}</span>
+              <span style={{ fontWeight: w, fontSize: "1.125rem" }}>{PANGRAM}</span>
+            </div>
+          ))}
+        </div>
+        <UsedByComponents ds={ds} tokenId={token.id} />
+      </div>
+    );
+  }
+
+  // ---- font size (fixed or fluid) ----
+  if (token.type === "dimension" && token.name.startsWith("fontSize")) {
+    const size = cssSize(value);
+    const fluid = isFluidValue(value);
+    return (
+      <div className="space-y-8">
+        <div className="font-mono text-[13px] text-strong">{size}</div>
+        <div className="ds-scope rounded-xl bg-white p-8 shadow-app-1">
+          <div style={{ fontSize: size, lineHeight: 1.2, fontWeight: 600 }}>Ag {token.name}</div>
+          {fluid && (
+            <div className="mt-3 text-[12px] text-faint">
+              Scales with the viewport — resize the window to see it change.
+            </div>
+          )}
+        </div>
+        <UsedByComponents ds={ds} tokenId={token.id} />
+      </div>
+    );
+  }
+
   // ---- dimension (radius / spacing) ----
   if (token.type === "dimension" && "dimension" in value) {
     const px = `${value.dimension}${value.unit}`;
@@ -133,20 +185,22 @@ export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) 
   // ---- typography ----
   if (token.type === "typography" && "typography" in value) {
     const t = value.typography;
-    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "1rem";
+    const size = cssSize(t.fontSize);
+    const family = typeof t.fontFamily === "string" ? t.fontFamily : undefined;
     return (
       <div className="space-y-8">
         <div className="font-mono text-[13px] text-faint">{formatTokenValue(value)}</div>
         <div className="ds-scope rounded-xl bg-white p-8 shadow-app-1">
           <div
             style={{
-              fontFamily: t.fontFamily,
+              fontFamily: family,
               fontSize: size,
               lineHeight: t.lineHeight,
               fontWeight: t.fontWeight,
+              ...(t.letterSpacing ? { letterSpacing: `${t.letterSpacing.dimension}${t.letterSpacing.unit}` } : {}),
             }}
           >
-            The quick brown fox jumps over the lazy dog
+            {PANGRAM}
           </div>
         </div>
         <UsedByComponents ds={ds} tokenId={token.id} />
