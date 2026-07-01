@@ -1,81 +1,18 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import type { DesignSystem, Token, TokenType } from "@yahoda/core";
+import { useEffect, useMemo, useState } from "react";
+import type { DesignSystem, Token } from "@yahoda/core";
 import { useWorkspace } from "@/store/workspace";
 import { TokenSwatch } from "./edit/PropertyTokenPicker";
 import { makeToken, validateTokenName } from "@/lib/tokens";
+import { CATEGORIES, type CreateCfg, type TokenGroup } from "@/lib/categories";
 
 /**
- * Toolbox-style system navigator. Instead of a document tree, the left rail is a set of
- * system categories (Colors, Typography, Spacing, …, Components). Each category has search,
- * its relevant items, and a "+ New" action. Patterns/Docs are reachable but de-emphasized.
+ * Toolbox-style system navigator. The active system category (Colors, Typography, …,
+ * Components) is chosen from the inline section tab bar above the canvas and lives in the
+ * workspace store; the sidebar renders that category's content — search, its relevant
+ * items, and a "+ New" action.
  */
-
-type CategoryId =
-  | "colors"
-  | "typography"
-  | "spacing"
-  | "radius"
-  | "effects"
-  | "motion"
-  | "components";
-
-interface CreateCfg {
-  type: TokenType;
-  namePrefix: string;
-  group: string;
-  /** button label, e.g. "Font family" */
-  label: string;
-}
-
-interface TokenGroup {
-  label: string;
-  filter: (t: Token) => boolean;
-}
-
-interface Category {
-  id: CategoryId;
-  label: string;
-  /** one or more "+ New" actions; empty for the component category */
-  creates: CreateCfg[];
-  match?: (t: Token) => boolean;
-  /** optional sub-grouping of the list (falls back to tier/flat) */
-  groups?: TokenGroup[];
-}
-
-const isFontSize = (t: Token) => t.type === "dimension" && t.name.startsWith("fontSize");
-
-const CATEGORIES: Category[] = [
-  { id: "colors", label: "Colors",
-    creates: [{ type: "color", namePrefix: "color", group: "Brand", label: "Color" }],
-    match: (t) => t.type === "color" },
-  { id: "typography", label: "Typography",
-    creates: [
-      { type: "fontFamily", namePrefix: "fontFamily", group: "Font family", label: "Font family" },
-      { type: "dimension", namePrefix: "fontSize", group: "Font size", label: "Font size" },
-      { type: "typography", namePrefix: "typography", group: "Typography", label: "Text style" },
-    ],
-    match: (t) => t.type === "typography" || t.type === "fontFamily" || isFontSize(t),
-    groups: [
-      { label: "Font families", filter: (t) => t.type === "fontFamily" },
-      { label: "Sizes", filter: isFontSize },
-      { label: "Text styles", filter: (t) => t.type === "typography" },
-    ] },
-  { id: "spacing", label: "Spacing",
-    creates: [{ type: "dimension", namePrefix: "spacing", group: "Spacing", label: "Spacing" }],
-    match: (t) => t.type === "dimension" && !t.name.startsWith("radius") && !isFontSize(t) },
-  { id: "radius", label: "Radius",
-    creates: [{ type: "dimension", namePrefix: "radius", group: "Radius", label: "Radius" }],
-    match: (t) => t.type === "dimension" && t.name.startsWith("radius") },
-  { id: "effects", label: "Effects",
-    creates: [{ type: "shadow", namePrefix: "shadow", group: "Elevation", label: "Shadow" }],
-    match: (t) => ["shadow", "border", "opacity"].includes(t.type) },
-  { id: "motion", label: "Motion",
-    creates: [{ type: "duration", namePrefix: "duration", group: "Motion", label: "Duration" }],
-    match: (t) => ["duration", "easing"].includes(t.type) },
-  { id: "components", label: "Components", creates: [] },
-];
 
 const TIERS: Token["tier"][] = ["primitive", "semantic", "component"];
 
@@ -84,14 +21,21 @@ export function Sidebar() {
   const selection = useWorkspace((s) => s.selection);
   const select = useWorkspace((s) => s.select);
   const createToken = useWorkspace((s) => s.createToken);
+  const active = useWorkspace((s) => s.category);
 
-  const [active, setActive] = useState<CategoryId>("colors");
   const [query, setQuery] = useState("");
   const [createCfg, setCreateCfg] = useState<CreateCfg | null>(null);
   const [newName, setNewName] = useState("");
 
   const category = CATEGORIES.find((c) => c.id === active)!;
   const q = query.trim().toLowerCase();
+
+  // The section tab bar drives `active`; clear per-category local UI when it changes.
+  useEffect(() => {
+    setQuery("");
+    setCreateCfg(null);
+    setNewName("");
+  }, [active]);
 
   const tokens = useMemo(
     () => (category.match ? ds.tokens.filter(category.match) : []),
@@ -123,25 +67,6 @@ export function Sidebar() {
 
   return (
     <nav className="flex w-64 shrink-0 flex-col border-r border-line bg-surface">
-      {/* category rail */}
-      <div className="flex flex-wrap gap-1 border-b border-line p-2">
-        {CATEGORIES.map((c) => (
-          <button
-            key={c.id}
-            onClick={() => {
-              setActive(c.id);
-              setQuery("");
-              resetCreate();
-            }}
-            className={`rounded-md px-2 py-1 text-[12px] ${
-              active === c.id ? "bg-primary text-white" : "text-muted hover:bg-page hover:text-strong"
-            }`}
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
-
       {/* search */}
       <div className="px-3 pt-3">
         <input

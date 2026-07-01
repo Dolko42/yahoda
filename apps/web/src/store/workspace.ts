@@ -24,6 +24,7 @@ import {
   updatePattern as coreUpdatePattern,
   updateToken as coreUpdateToken,
 } from "@yahoda/core";
+import type { CategoryId } from "@/lib/categories";
 import { saveWorkspace } from "@/lib/workspaceRepo";
 
 export interface Selection {
@@ -53,6 +54,8 @@ interface WorkspaceState {
   ds: DesignSystem;
   selection: Selection | null;
   tab: InspectorTab;
+  /** Active system category — drives the section tab bar and the sidebar's content. */
+  category: CategoryId;
   canvasView: "preview" | "graph";
   hydrated: boolean;
   /** Recipe editor scope for the selected component. */
@@ -60,6 +63,7 @@ interface WorkspaceState {
 
   select: (sel: Selection) => void;
   setTab: (tab: InspectorTab) => void;
+  setCategory: (category: CategoryId) => void;
   setCanvasView: (view: "preview" | "graph") => void;
   setRecipeScope: (scope: RecipeScope) => void;
   hydrate: (ds: DesignSystem) => void;
@@ -110,12 +114,14 @@ export const useWorkspace = create<WorkspaceState>((set) => {
     ds: initialSeed(),
     selection: { kind: "token", id: "t.color.primary" },
     tab: "properties",
+    category: "colors",
     canvasView: "preview",
     hydrated: false,
     recipeScope: {},
 
     select: (selection) => set({ selection, recipeScope: {} }),
     setTab: (tab) => set({ tab }),
+    setCategory: (category) => set({ category }),
     setCanvasView: (canvasView) => set({ canvasView }),
     setRecipeScope: (recipeScope) => set({ recipeScope }),
     hydrate: (ds) => set({ ds, hydrated: true }),

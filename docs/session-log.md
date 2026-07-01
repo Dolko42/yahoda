@@ -20,6 +20,22 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-01 — UI: section tabs above canvas, cleaner navbar/sidebar
+
+- **Branch / commits:** main · working tree only — **not committed** (this handoff commit will be the first). Changed: `Navbar`, `Sidebar`, `Workspace`, `store/workspace.ts`; new `SectionTabs.tsx`, `lib/categories.ts`.
+- **State:** green — `pnpm --filter @yahoda/web typecheck` (`tsc --noEmit`) clean. Verified live in preview: tab switch drives sidebar search/list/"+ New", token select still updates canvas + inspector, no console errors. Tests **not run** this session (no logic touched — pure UI/layout move).
+- **Done this session:**
+  - Moved the system category nav **out of the left sidebar** into an inline underline tab bar (`SectionTabs`) sitting above the canvas (Unplain-style; active tab = primary-blue underline).
+  - Lifted the active-category state into the workspace store (`category` + `setCategory`), so the tab bar and sidebar share one source; extracted the `CATEGORIES` definitions to `lib/categories.ts` (was inline in `Sidebar`).
+  - Sidebar now renders only the active section (search + grouped items + "+ New"); a `useEffect` resets local search/create when `category` changes.
+  - Removed the "Acme UI" design-system selector (+ its divider) from the navbar — logo only, no replacement picker.
+- **Next / open questions:**
+  - Active category is **not persisted** — reload returns to `colors` (same as before). If last-viewed section should survive reloads, add it to persistence.
+  - Navbar has no system picker now; that's the natural home for a real switcher when multi-design-system support lands (still single-system, unchanged).
+- **Gotchas / non-obvious context:**
+  - `category` sits in the Zustand store alongside `selection`/`tab`/`canvasView` (the established UI-state pattern) — not in a context/prop. No data-model, Supabase, or binding changes.
+  - `lib/categories.ts` is the **single source** for category `match`/`creates`/`groups`; edit there, not in `Sidebar`. Both `SectionTabs` and `Sidebar` import it.
+
 ## 2026-07-01 — Live Supabase connection (Phase 2 finalization)
 
 - **Branch / commits:** main · `6cb71f4` — **pushed**

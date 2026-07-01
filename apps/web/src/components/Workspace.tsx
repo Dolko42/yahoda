@@ -7,6 +7,7 @@ import { loadFromCloud } from "@/lib/supabase/repository";
 import { getSupabase } from "@/lib/supabase/client";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
+import { SectionTabs } from "./SectionTabs";
 import { Canvas } from "./Canvas";
 import { Inspector } from "./Inspector";
 
@@ -49,8 +50,11 @@ export function Workspace() {
       <Navbar />
       <div className="flex min-h-0 flex-1">
         <Sidebar />
-        <main className="min-w-0 flex-1 p-3">
-          <Canvas />
+        <main className="flex min-w-0 flex-1 flex-col">
+          <SectionTabs />
+          <div className="min-h-0 flex-1 p-3">
+            <Canvas />
+          </div>
         </main>
         <Inspector />
       </div>

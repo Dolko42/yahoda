@@ -28,13 +28,6 @@ export function Navbar() {
         <span className="text-[15px] font-semibold tracking-tight">Yahoda</span>
       </div>
 
-      <div className="h-5 w-px bg-line" />
-
-      <button className="flex items-center gap-1.5 rounded-full bg-page px-3 py-1 text-[13px] text-muted hover:text-strong">
-        <span className="font-medium text-strong">{ds.name}</span>
-        <span className="text-faint">▾</span>
-      </button>
-
       <div className="ml-auto flex items-center gap-3">
         <span
           className="flex items-center gap-1.5 text-[12px] text-muted"
