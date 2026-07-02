@@ -20,6 +20,25 @@ TEMPLATE — copy for a new entry, put it at the TOP, under this comment:
 - **Gotchas / non-obvious context:** <traps, env quirks, things the diff won't tell you>
 -->
 
+## 2026-07-02 — Typography subsystem: fonts, base styles, inheritance
+
+- **Branch / commits:** main · feature commit + this `chore: session handoff` commit — **pushed**.
+- **State:** green — `pnpm -r typecheck` clean; **146 core tests** pass (22 new in `typography/typography.test.ts`, 5 golden snapshots regenerated), **2 web tests** pass. Verified live in preview: sidebar sections, override→reset round-trip, font-stack cascade (Georgia test), safe-delete reassign flow, creation form, Button/Card resolved typography, Code tab, letter-spacing unit select — no console errors/warnings.
+- **Done this session:**
+  - **Model:** new `fontFamily` TokenType (`{fontFamily: "stack"}`, primitive tier) + `TypographyValue` reworked to a *partial* style — all fields optional, `extends?: {$ref}` (parent style), `fontFamily?: string | {$ref → font token}`, new `textTransform`/`fontStyle`. Old fully-specified typography values still parse (superset) — **no migration, no Supabase schema change** (type=text, value=jsonb).
+  - **Core:** new `packages/core/src/typography/` — `resolveTypographyToken` (extends-chain merge, local wins, per-field **provenance** own/inherited/default, cycle/missing-safe), `resolveFontFamily`, parent/children/`getFontFamilyUsages`, `groupTypographyStylesByRole`, guards, `validateTypographyValue`. Graph/`reassignToken`/`validateInvariants` now cover the nested `extends`/`fontFamily`/`fontSize` refs (new `EXTENDS_CYCLE` code). CSS/Tailwind/AI-context exporters emit **resolved** styles (family stays `var(--font-*)` in CSS when ref-bound).
+  - **Seed:** `font.{heading,body,mono}`, 4 base styles (primitive tier, e.g. `typography.heading.base`), 16 semantic styles (display/heading/body/label/link/caption/eyebrow). Existing ids kept (`t.type.heading.lg` etc.); Button font → `label.md`, Input font → `body.md`, Card `titleTypography`/`bodyTypography` added.
+  - **Web:** `TypographySidebar` (Font Families / Base Styles / role-grouped Text Styles + typed 3-way creation), `edit/TypographyTokenExtras` (parent binder, per-field editors with "from heading.base" chips + Reset-to-inherited), `preview/TypographyPreview` (font specimen w/ dependent styles; base w/ inheriting styles; semantic emphasized inside full stylesheet specimen), `slotTypography`/`typographyCss` in `lib/style.ts`, Code-tab resolved output, `docs/data-model.md` updated.
+- **Next / open questions:**
+  - Candidate follow-ups (not requested): Google Fonts picker, type-scale generator (à la color "Generate scale"), shared `fontSize.*` dimension tokens, seed-merge for pre-existing persisted workspaces (they keep old typography tokens; they parse fine but don't gain the new fonts/bases).
+  - Supabase authenticated round-trip still human-unverified (carried from Phase 2).
+- **Gotchas / non-obvious context:**
+  - **Inheritance is in the value, not metadata** — `extends`/`fontFamily` refs live inside `TypographyValue`; deliberately no `metadata.parentTokenId` (one-model law, mirrors the colors decision). Anything walking refs must handle these nested ones (graph, reassign, validate already do).
+  - **Editing style fields uses `patchToken(id, {value})`, not `patchTokenValue`** — the latter redirects to the resolved alias source. Reset-to-inherited = delete the own field from the value; resolution falls back through the chain.
+  - `isRefValue` was widened to `(v: unknown)` so it narrows nested field unions (`string | {$ref}`) — vitest passed before `tsc` caught this; **build core before trusting test-green**.
+  - Base styles are `typography` tokens at **primitive tier** (that's the base/semantic discriminator — name suffix `.base` is convention only).
+  - Inspector skips the generic Value row for `typography`/`fontFamily` tokens; `TypographyTokenExtras` owns editing. Golden export snapshots + `graph.test.ts` are coupled to the seed — reseeding typography means `vitest run -u` + review.
+
 ## 2026-07-01 — Colors subsystem: primitive/semantic editor
 
 - **Branch / commits:** main · working tree only at handoff time — this `chore: session handoff` commit is the first for the work (will be pushed).
