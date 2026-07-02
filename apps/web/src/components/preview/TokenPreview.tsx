@@ -18,6 +18,7 @@ import { useWorkspace } from "@/store/workspace";
 import { findComponent } from "@/lib/nodes";
 import { formatTokenValue } from "@/lib/format";
 import { ComponentElement } from "./ComponentElement";
+import { TypographyPreview } from "./TypographyPreview";
 
 function ContrastBadge({ fg, bg, label }: { fg: string; bg: string; label: string }) {
   const ratio = contrastRatio(fg, bg);
@@ -235,25 +236,11 @@ export function TokenPreview({ ds, token }: { ds: DesignSystem; token: Token }) 
     );
   }
 
-  // ---- typography ----
-  if (token.type === "typography" && "typography" in value) {
-    const t = value.typography;
-    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "1rem";
+  // ---- typography / font families ----
+  if (token.type === "typography" || token.type === "fontFamily") {
     return (
       <div className="space-y-8">
-        <div className="font-mono text-[13px] text-faint">{formatTokenValue(value)}</div>
-        <div className="ds-scope rounded-xl bg-white p-8 shadow-app-1">
-          <div
-            style={{
-              fontFamily: t.fontFamily,
-              fontSize: size,
-              lineHeight: t.lineHeight,
-              fontWeight: t.fontWeight,
-            }}
-          >
-            The quick brown fox jumps over the lazy dog
-          </div>
-        </div>
+        <TypographyPreview ds={ds} token={token} />
         <UsedByComponents ds={ds} tokenId={token.id} />
       </div>
     );

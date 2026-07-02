@@ -79,6 +79,32 @@ export function reassignToken(
     if (isRefValue(t.value) && t.value.$ref === fromId) {
       next = mark({ ...next, value: { $ref: toId }, meta: { ...next.meta, updatedAt: clock } });
     }
+    // typography composites hold refs inside the value (extends / fontFamily / fontSize)
+    if ("typography" in next.value) {
+      const ty = next.value.typography;
+      const hit =
+        ty.extends?.$ref === fromId ||
+        (ty.fontFamily && isRefValue(ty.fontFamily) && ty.fontFamily.$ref === fromId) ||
+        (ty.fontSize && isRefValue(ty.fontSize) && ty.fontSize.$ref === fromId);
+      if (hit) {
+        next = mark({
+          ...next,
+          value: {
+            typography: {
+              ...ty,
+              ...(ty.extends?.$ref === fromId ? { extends: { $ref: toId } } : {}),
+              ...(ty.fontFamily && isRefValue(ty.fontFamily) && ty.fontFamily.$ref === fromId
+                ? { fontFamily: { $ref: toId } }
+                : {}),
+              ...(ty.fontSize && isRefValue(ty.fontSize) && ty.fontSize.$ref === fromId
+                ? { fontSize: { $ref: toId } }
+                : {}),
+            },
+          },
+          meta: { ...next.meta, updatedAt: clock },
+        });
+      }
+    }
     if (next.deprecated?.replacedBy === fromId) {
       next = mark({ ...next, deprecated: { ...next.deprecated, replacedBy: toId } });
     }

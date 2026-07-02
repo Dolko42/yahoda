@@ -5,7 +5,35 @@ import {
   type ResolveScope,
   type TokenValue,
   resolveComponent,
+  resolveTypographyToken,
 } from "@yahoda/core";
+
+/** Resolved typography token → inline CSS (defaults like "normal"/"none" are omitted). */
+export function typographyCss(ds: DesignSystem, tokenId: string): CSSProperties {
+  const { style: s } = resolveTypographyToken(ds, tokenId);
+  const css: CSSProperties = {
+    fontFamily: s.fontFamily,
+    fontSize: s.fontSize,
+    fontWeight: s.fontWeight,
+    lineHeight: s.lineHeight,
+  };
+  if (s.letterSpacing !== "normal") css.letterSpacing = s.letterSpacing;
+  if (s.textTransform !== "none") css.textTransform = s.textTransform;
+  if (s.fontStyle !== "normal") css.fontStyle = s.fontStyle;
+  return css;
+}
+
+/** The typography CSS a component binds to a given property (e.g. titleTypography), or null. */
+export function slotTypography(
+  ds: DesignSystem,
+  component: Component,
+  property: string,
+  scope: ResolveScope = {},
+): CSSProperties | null {
+  const binding = resolveComponent(ds, component, scope).find((b) => b.property === property);
+  if (!binding || !binding.resolved.ok) return null;
+  return typographyCss(ds, binding.tokenId);
+}
 
 const dimToCss = (v: TokenValue): string | null =>
   "dimension" in v ? `${v.dimension}${v.unit}` : null;
@@ -84,14 +112,7 @@ export function componentStyle(
         break;
       case "font":
       case "typography":
-        if ("typography" in v) {
-          const t = v.typography;
-          style.fontFamily = t.fontFamily;
-          if ("dimension" in t.fontSize)
-            style.fontSize = `${t.fontSize.dimension}${t.fontSize.unit}`;
-          style.lineHeight = t.lineHeight;
-          style.fontWeight = t.fontWeight;
-        }
+        if ("typography" in v) Object.assign(style, typographyCss(ds, b.tokenId));
         break;
       default:
         break;

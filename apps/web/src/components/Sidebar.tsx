@@ -7,6 +7,7 @@ import { TokenSwatch } from "./edit/PropertyTokenPicker";
 import { makeToken, validateTokenName } from "@/lib/tokens";
 import { CATEGORIES, type CreateCfg, type TokenGroup } from "@/lib/categories";
 import { ColorsSidebar } from "./ColorsSidebar";
+import { TypographySidebar } from "./TypographySidebar";
 
 /**
  * Toolbox-style system navigator. The active system category (Colors, Typography, …,
@@ -70,6 +71,7 @@ export function Sidebar() {
   };
 
   if (isColors) return <ColorsSidebar />;
+  if (active === "typography") return <TypographySidebar />;
 
   return (
     <nav className="flex w-64 shrink-0 flex-col border-r border-line bg-surface">

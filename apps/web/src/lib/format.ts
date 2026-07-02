@@ -5,12 +5,17 @@ export function formatTokenValue(value: TokenValue): string {
   if (isRefValue(value)) return `→ ${value.$ref}`;
   if ("color" in value) return value.color;
   if ("dimension" in value) return `${value.dimension}${value.unit}`;
+  if ("fontFamily" in value) return value.fontFamily;
   if ("typography" in value) {
+    // compact view of what this level defines; inheritance resolves elsewhere
     const t = value.typography;
-    const size = isRefValue(t.fontSize)
-      ? `→${t.fontSize.$ref}`
-      : `${t.fontSize.dimension}${t.fontSize.unit}`;
-    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
+    const parts: string[] = [];
+    if (t.fontFamily !== undefined && !isRefValue(t.fontFamily)) parts.push(t.fontFamily);
+    if (t.fontSize !== undefined)
+      parts.push(isRefValue(t.fontSize) ? `→${t.fontSize.$ref}` : `${t.fontSize.dimension}${t.fontSize.unit}`);
+    if (t.lineHeight !== undefined) parts.push(`/${t.lineHeight}`);
+    if (t.fontWeight !== undefined) parts.push(String(t.fontWeight));
+    return parts.join(" ") || (t.extends ? `extends ${t.extends.$ref}` : "Aa");
   }
   if ("shadow" in value) {
     return value.shadow

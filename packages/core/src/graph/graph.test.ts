@@ -22,7 +22,7 @@ describe("dependency graph", () => {
         "t.spacing.1",
         "t.spacing.2",
         "t.spacing.3",
-        "t.type.label.sm",
+        "t.type.label.md",
         // hover state override
         "t.color.primaryHover",
         // secondary variant overrides

@@ -50,8 +50,11 @@ function resolveNested(byId: Map<string, Token>, value: TokenValue): TokenValue 
 
   if ("typography" in value) {
     const ty = value.typography;
-    const fontSize = isRefValue(ty.fontSize) ? colorOf(ty.fontSize) : ty.fontSize;
-    return { typography: { ...ty, fontSize } } as TokenValue;
+    const fontSize =
+      ty.fontSize !== undefined && isRefValue(ty.fontSize) ? colorOf(ty.fontSize) : ty.fontSize;
+    return {
+      typography: { ...ty, ...(fontSize !== undefined ? { fontSize } : {}) },
+    } as TokenValue;
   }
   if ("shadow" in value) {
     return {

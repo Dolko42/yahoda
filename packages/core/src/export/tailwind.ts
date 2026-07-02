@@ -1,6 +1,6 @@
-import type { DesignSystem, TokenValue } from "../schema/index.js";
-import { isRefValue } from "../schema/index.js";
-import { dashName, header, sortedTokens, tokenNameMap } from "./util.js";
+import type { DesignSystem } from "../schema/index.js";
+import { resolveTypographyToken } from "../typography/index.js";
+import { dashName, header, sortedTokens } from "./util.js";
 
 /**
  * Tailwind theme config. Keys keep SEMANTIC token names; values reference the CSS
@@ -13,19 +13,13 @@ const strip = (name: string, prefix: string): string =>
 
 const varRef = (name: string): string => `var(--${dashName(name)})`;
 
-function sizeOf(v: TokenValue, names: Map<string, string>): string {
-  if (isRefValue(v)) return `var(--${dashName(names.get(v.$ref) ?? v.$ref)})`;
-  if ("dimension" in v) return `${v.dimension}${v.unit}`;
-  return "1rem";
-}
-
 export function exportTailwind(ds: DesignSystem): string {
-  const names = tokenNameMap(ds);
   const tokens = sortedTokens(ds);
 
   const colors: Record<string, string> = {};
   const borderRadius: Record<string, string> = {};
   const spacing: Record<string, string> = {};
+  const fontFamily: Record<string, string> = {};
   const fontSize: Record<string, [string, { lineHeight: string; fontWeight: string }]> = {};
   const boxShadow: Record<string, string> = {};
   const transitionDuration: Record<string, string> = {};
@@ -40,14 +34,17 @@ export function exportTailwind(ds: DesignSystem): string {
         if (t.name.startsWith("radius.")) borderRadius[strip(t.name, "radius")] = varRef(t.name);
         else if (t.name.startsWith("spacing.")) spacing[strip(t.name, "spacing")] = varRef(t.name);
         break;
+      case "fontFamily":
+        fontFamily[strip(t.name, "font")] = varRef(t.name);
+        break;
       case "typography": {
-        if ("typography" in t.value) {
-          const ty = t.value.typography;
-          fontSize[strip(t.name, "typography").replace(/\./g, "-")] = [
-            sizeOf(ty.fontSize, names),
-            { lineHeight: String(ty.lineHeight), fontWeight: String(ty.fontWeight) },
-          ];
-        }
+        // resolved through the inheritance chain so every style is complete
+        const resolved = resolveTypographyToken(ds, t.id);
+        const s = resolved.style;
+        fontSize[strip(t.name, "typography").replace(/\./g, "-")] = [
+          s.fontSize,
+          { lineHeight: String(s.lineHeight), fontWeight: String(s.fontWeight) },
+        ];
         break;
       }
       case "shadow":
@@ -71,6 +68,7 @@ export function exportTailwind(ds: DesignSystem): string {
   put("colors", colors);
   put("borderRadius", borderRadius);
   put("spacing", spacing);
+  put("fontFamily", fontFamily);
   put("fontSize", fontSize);
   put("boxShadow", boxShadow);
   put("transitionDuration", transitionDuration);

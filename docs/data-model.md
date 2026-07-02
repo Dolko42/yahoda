@@ -48,7 +48,8 @@ DesignSystem = {
 ```ts
 TokenType =
   | "color" | "dimension"        // dimension = spacing/radius/size (unit-bearing)
-  | "typography"                 // composite
+  | "fontFamily"                 // a font stack, e.g. `"Inter", system-ui, sans-serif`
+  | "typography"                 // composite text style; may inherit via `extends`
   | "shadow" | "border"
   | "duration" | "easing"        // motion
   | "opacity" | "zIndex"
@@ -72,8 +73,14 @@ Token = {
 | { $ref: string }                                   // alias to another token
 | { color: string }                                  // hex/oklch; type=color
 | { dimension: number; unit: "px"|"rem"|"em"|"%" }   // type=dimension
-| { fontFamily: string; fontSize: Ref|Dim; lineHeight: number;
-    fontWeight: number; letterSpacing?: Dim }        // type=typography (composite)
+| { fontFamily: string }                             // type=fontFamily (a font stack)
+| { typography: {                                    // type=typography (composite)
+      extends?: Ref                                  //   parent/base style to inherit
+      fontFamily?: string | Ref                      //   raw stack OR ref to a fontFamily token
+      fontSize?: Ref|Dim; lineHeight?: number; fontWeight?: number
+      letterSpacing?: Dim
+      textTransform?: "none"|"uppercase"|"lowercase"|"capitalize"
+      fontStyle?: "normal"|"italic" } }              //   all fields optional (partial style)
 | { x: Dim; y: Dim; blur: Dim; spread: Dim; color: Ref|Color; inset?: boolean }[] // shadow
 | { duration: number; unit: "ms"|"s" }               // type=duration
 | { easing: [number,number,number,number] | string } // type=easing
@@ -95,6 +102,21 @@ Button.bg         (component binding → color.primary)
 
 Resolution (`core/resolve`) follows `$ref` chains to a concrete value. Cycles are
 detected and rejected at validation time.
+
+### Typography inheritance (same tiers, adapted for text)
+```
+font.heading            (fontFamily primitive, {fontFamily:'"Inter Tight", …'})
+        ▲ fontFamily $ref
+typography.heading.base (typography primitive — shared defaults: weight/line-height/…)
+        ▲ extends $ref
+typography.heading.lg   (typography semantic — overrides fontSize)
+        ▲ binding
+Button.font             (component binding → a semantic text style)
+```
+Resolution (`core/typography`) merges the `extends` chain root-first — a locally set
+field always wins — then resolves font/size refs and fills gaps with defaults. The
+`extends`/`fontFamily`/`fontSize` refs live inside the value, so the dependency graph,
+safe deletion, and validation cover them like any other reference.
 
 ### Multiple tokens per type
 Required and natural: `radius.sm/md/lg`, `spacing.1..12`, `typography.heading.lg` etc.

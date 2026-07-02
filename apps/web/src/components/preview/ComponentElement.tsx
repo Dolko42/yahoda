@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from "react";
 import type { Component, DesignSystem, ResolveScope } from "@yahoda/core";
-import { componentStyle } from "@/lib/style";
+import { componentStyle, slotTypography } from "@/lib/style";
 
 interface Props {
   ds: DesignSystem;
@@ -56,13 +56,16 @@ export function ComponentElement({ ds, component, scope = {} }: Props) {
           style={{ minWidth: 220, ...s }}
         />
       );
-    case "Card":
+    case "Card": {
+      const title = slotTypography(ds, component, "titleTypography", scope);
+      const body = slotTypography(ds, component, "bodyTypography", scope);
       return (
         <div style={{ minWidth: 220, minHeight: 96, ...s }}>
-          <div style={{ fontWeight: 600, marginBottom: 6 }}>Card title</div>
-          <div style={{ fontSize: 13, opacity: 0.7 }}>Grouped content lives here.</div>
+          <div style={{ fontWeight: 600, marginBottom: 6, ...title }}>Card title</div>
+          <div style={{ fontSize: 13, opacity: 0.7, ...body }}>Grouped content lives here.</div>
         </div>
       );
+    }
     case "Alert":
       return (
         <div style={{ minWidth: 260, fontSize: 13, ...s }}>

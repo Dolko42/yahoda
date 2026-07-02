@@ -10,7 +10,8 @@ import { Deprecation, Id, NodeMeta } from "./common.js";
 export const TokenType = z.enum([
   "color",
   "dimension", // spacing / radius / size (unit-bearing)
-  "typography", // composite
+  "fontFamily", // a font stack, e.g. `"Inter", system-ui, sans-serif`
+  "typography", // composite text style (may inherit from another via `extends`)
   "shadow",
   "border",
   "duration", // motion
@@ -39,15 +40,33 @@ export const DimensionValue = z
 const DimensionOrRef = z.union([DimensionValue, RefValue]);
 const ColorOrRef = z.union([ColorValue, RefValue]);
 
+export const FontFamilyValue = z
+  .object({ fontFamily: z.string().min(1) })
+  .strict();
+
+export const TextTransform = z.enum(["none", "uppercase", "lowercase", "capitalize"]);
+export const FontStyle = z.enum(["normal", "italic"]);
+
+/**
+ * A text style. Every field is optional: a *base* style defines shared defaults
+ * (family/weight/line-height…), a *semantic* style points at its base via `extends`
+ * and overrides what differs (usually fontSize). Resolution merges the `extends`
+ * chain parent-first; a locally set field always wins. `fontFamily` may be a raw
+ * stack or a `$ref` to a fontFamily token.
+ */
 export const TypographyValue = z
   .object({
     typography: z
       .object({
-        fontFamily: z.string().min(1),
-        fontSize: DimensionOrRef,
-        lineHeight: z.number().positive(),
-        fontWeight: z.number().int(),
+        /** parent/base typography token this style inherits from */
+        extends: RefValue.optional(),
+        fontFamily: z.union([z.string().min(1), RefValue]).optional(),
+        fontSize: DimensionOrRef.optional(),
+        lineHeight: z.number().positive().optional(),
+        fontWeight: z.number().int().min(1).max(1000).optional(),
         letterSpacing: DimensionValue.optional(),
+        textTransform: TextTransform.optional(),
+        fontStyle: FontStyle.optional(),
       })
       .strict(),
   })
@@ -101,6 +120,7 @@ export const TokenValue = z.union([
   RefValue,
   ColorValue,
   DimensionValue,
+  FontFamilyValue,
   TypographyValue,
   ShadowValue,
   BorderValue,
@@ -111,8 +131,8 @@ export const TokenValue = z.union([
 ]);
 export type TokenValue = z.infer<typeof TokenValue>;
 
-/** Type guard: is this value an alias reference? */
-export function isRefValue(v: TokenValue): v is z.infer<typeof RefValue> {
+/** Type guard: is this value an alias reference? (also narrows nested field unions) */
+export function isRefValue(v: unknown): v is z.infer<typeof RefValue> {
   return typeof v === "object" && v !== null && "$ref" in v;
 }
 

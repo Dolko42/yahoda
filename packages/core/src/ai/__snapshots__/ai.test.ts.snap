@@ -3,7 +3,7 @@
 exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 "# AI context — Acme UI
 
-> schemaVersion 1.0.0 · commit draft · hash h_b41bf793
+> schemaVersion 1.0.0 · commit draft · hash h_2fc14fa8
 > Use only the components, tokens, and rules below. Do not invent components or values.
 
 ## Tokens
@@ -20,6 +20,9 @@ exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 | \`color.transparent\` | color | semantic | transparent | No fill — e.g. ghost button background. |
 | \`duration.fast\` | duration | semantic | 150ms | Hover/press micro-interactions. |
 | \`easing.standard\` | easing | semantic | cubic-bezier(0.2, 0, 0, 1) | Default easing for UI transitions. |
+| \`font.body\` | fontFamily | primitive | "Inter", system-ui, sans-serif | Body copy, labels, and UI text. |
+| \`font.heading\` | fontFamily | primitive | "Inter Tight", "Inter", system-ui, sans-serif | Display and heading text. |
+| \`font.mono\` | fontFamily | primitive | "JetBrains Mono", ui-monospace, monospace | Code and tabular figures. |
 | \`palette.blue.600\` | color | primitive | #2448B8 |  |
 | \`palette.blue.700\` | color | primitive | #1E3FA0 |  |
 | \`palette.red.600\` | color | primitive | #C0341D |  |
@@ -36,9 +39,26 @@ exports[`renderAIContextMarkdown > matches the golden snapshot 1`] = `
 | \`spacing.3\` | dimension | semantic | 12px |  |
 | \`spacing.4\` | dimension | semantic | 16px |  |
 | \`spacing.6\` | dimension | semantic | 24px |  |
-| \`typography.body.md\` | typography | semantic | Inter 1rem/1.5 400 | Default body copy. |
-| \`typography.heading.lg\` | typography | semantic | Inter 2rem/1.2 700 | Page and section headings. |
-| \`typography.label.sm\` | typography | semantic | Inter 0.875rem/1.4 500 | Form labels and button text. |
+| \`typography.body.base\` | typography | primitive | "Inter", system-ui, sans-serif 1rem/1.5 400 | Shared defaults for body and caption styles. |
+| \`typography.body.lg\` | typography | semantic | "Inter", system-ui, sans-serif 1.125rem/1.5 400 | Lead paragraphs. |
+| \`typography.body.md\` | typography | semantic | "Inter", system-ui, sans-serif 1rem/1.5 400 | Default body copy. |
+| \`typography.body.sm\` | typography | semantic | "Inter", system-ui, sans-serif 0.875rem/1.5 400 | Dense/secondary body copy. |
+| \`typography.caption\` | typography | semantic | "Inter", system-ui, sans-serif 0.75rem/1.35 400 | Helper text and image captions. |
+| \`typography.display.lg\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 3rem/1.1 700 | Large display text. |
+| \`typography.display.xl\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 3.75rem/1.05 700 | Hero/marketing display text. |
+| \`typography.eyebrow\` | typography | semantic | "Inter", system-ui, sans-serif 0.75rem/1.4 600 | Small uppercase kicker above headings. |
+| \`typography.heading.base\` | typography | primitive | "Inter Tight", "Inter", system-ui, sans-serif 1rem/1.15 700 | Shared defaults for display and heading styles. |
+| \`typography.heading.lg\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 2rem/1.15 700 | Page and section headings. |
+| \`typography.heading.md\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 1.5rem/1.25 700 | Subsection headings. |
+| \`typography.heading.sm\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 1.25rem/1.3 600 | Card titles and minor headings. |
+| \`typography.heading.xl\` | typography | semantic | "Inter Tight", "Inter", system-ui, sans-serif 2.25rem/1.15 700 | Top-level page titles. |
+| \`typography.label.base\` | typography | primitive | "Inter", system-ui, sans-serif 1rem/1.4 500 | Shared defaults for labels and eyebrows. |
+| \`typography.label.lg\` | typography | semantic | "Inter", system-ui, sans-serif 1rem/1.4 500 | Large buttons and prominent labels. |
+| \`typography.label.md\` | typography | semantic | "Inter", system-ui, sans-serif 0.875rem/1.4 500 | Buttons and form labels. |
+| \`typography.label.sm\` | typography | semantic | "Inter", system-ui, sans-serif 0.75rem/1.4 500 | Compact labels and badges. |
+| \`typography.link.base\` | typography | primitive | "Inter", system-ui, sans-serif 1rem/1.5 500 | Shared defaults for link styles. |
+| \`typography.link.md\` | typography | semantic | "Inter", system-ui, sans-serif 1rem/1.5 500 | Inline links in body copy. |
+| \`typography.link.sm\` | typography | semantic | "Inter", system-ui, sans-serif 0.875rem/1.5 500 | Small/secondary links. |
 
 ## Components
 
@@ -81,7 +101,7 @@ _Trigger a single, clear action._
 
 - **Variants:** primary, secondary, ghost
 - **States:** default, hover, focus, disabled, loading
-- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, font=\`typography.label.sm\`, gap=\`spacing.1\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.md\`
+- **Tokens:** background=\`color.primary\`, color=\`color.textOnPrimary\`, font=\`typography.label.md\`, gap=\`spacing.1\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.md\`
 
 **Do:**
 - Use for the single primary action on a screen.
@@ -99,7 +119,7 @@ _Group related content on a surface._
 
 - **Variants:** default
 - **States:** default
-- **Tokens:** background=\`color.surface\`, padding=\`spacing.4\`, radius=\`radius.lg\`, shadow=\`shadow.sm\`
+- **Tokens:** background=\`color.surface\`, bodyTypography=\`typography.body.md\`, padding=\`spacing.4\`, radius=\`radius.lg\`, shadow=\`shadow.sm\`, titleTypography=\`typography.heading.sm\`
 
 **Do:**
 - Use to group related content into a scannable unit.
@@ -134,7 +154,7 @@ _Collect a single line of text from the user._
 
 - **Variants:** default, error
 - **States:** default, focus, disabled
-- **Tokens:** background=\`color.surface\`, borderColor=\`color.border\`, color=\`color.text\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.sm\`
+- **Tokens:** background=\`color.surface\`, borderColor=\`color.border\`, color=\`color.text\`, font=\`typography.body.md\`, paddingX=\`spacing.3\`, paddingY=\`spacing.2\`, radius=\`radius.sm\`
 
 **Do:**
 - Always pair with a visible label.

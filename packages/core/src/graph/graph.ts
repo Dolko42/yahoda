@@ -50,6 +50,14 @@ export function buildDependencyIndex(ds: GraphSource): DependencyIndex {
 
   for (const t of ds.tokens) {
     if (isRefValue(t.value)) edge(t.id, t.value.$ref);
+    // typography composites reference other tokens from inside the value:
+    // the parent style (extends), the font family, and the font size
+    if ("typography" in t.value) {
+      const ty = t.value.typography;
+      if (ty.extends) edge(t.id, ty.extends.$ref);
+      if (ty.fontFamily && isRefValue(ty.fontFamily)) edge(t.id, ty.fontFamily.$ref);
+      if (ty.fontSize && isRefValue(ty.fontSize)) edge(t.id, ty.fontSize.$ref);
+    }
   }
 
   for (const c of ds.components) {

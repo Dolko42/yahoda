@@ -13,14 +13,26 @@ function fmt(v: TokenValue, names: Map<string, string>): string {
   if (isRefValue(v)) return `→ ${names.get(v.$ref) ?? v.$ref}`;
   if ("color" in v) return v.color;
   if ("dimension" in v) return `${v.dimension}${v.unit}`;
+  if ("fontFamily" in v) return v.fontFamily;
   if ("opacity" in v) return String(v.opacity);
   if ("zIndex" in v) return String(v.zIndex);
   if ("duration" in v) return `${v.duration}${v.unit}`;
   if ("easing" in v) return Array.isArray(v.easing) ? `cubic-bezier(${v.easing.join(", ")})` : v.easing;
   if ("typography" in v) {
+    // a partial style: show what this level defines (inheritance is resolved elsewhere)
     const t = v.typography;
-    const size = isRefValue(t.fontSize) ? `→${names.get(t.fontSize.$ref) ?? ""}` : `${t.fontSize.dimension}${t.fontSize.unit}`;
-    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
+    const parts: string[] = [];
+    if (t.extends) parts.push(`extends ${names.get(t.extends.$ref) ?? t.extends.$ref}`);
+    if (t.fontFamily !== undefined)
+      parts.push(isRefValue(t.fontFamily) ? `→${names.get(t.fontFamily.$ref) ?? t.fontFamily.$ref}` : t.fontFamily);
+    if (t.fontSize !== undefined)
+      parts.push(isRefValue(t.fontSize) ? `→${names.get(t.fontSize.$ref) ?? ""}` : `${t.fontSize.dimension}${t.fontSize.unit}`);
+    if (t.lineHeight !== undefined) parts.push(`lh ${t.lineHeight}`);
+    if (t.fontWeight !== undefined) parts.push(`w ${t.fontWeight}`);
+    if (t.letterSpacing !== undefined) parts.push(`ls ${t.letterSpacing.dimension}${t.letterSpacing.unit}`);
+    if (t.textTransform !== undefined) parts.push(t.textTransform);
+    if (t.fontStyle !== undefined) parts.push(t.fontStyle);
+    return parts.join(", ") || "—";
   }
   if ("shadow" in v) return `${v.shadow.length} layer(s)`;
   if ("border" in v) return `${v.border.style} border`;

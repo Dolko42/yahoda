@@ -7,6 +7,7 @@ import type {
 } from "../schema/index.js";
 import { evaluateComponentContrast } from "../a11y/index.js";
 import { resolveComponent, resolveTokenValue } from "../resolve/index.js";
+import { resolveTypographyToken } from "../typography/index.js";
 
 /**
  * Structured AI context — a pure projection of the model. The app does NOT generate
@@ -67,15 +68,11 @@ const byName = <T extends { name: string }>(a: T, b: T) => a.name.localeCompare(
 function formatValue(v: TokenValue): string {
   if ("color" in v) return v.color;
   if ("dimension" in v) return `${v.dimension}${v.unit}`;
+  if ("fontFamily" in v && typeof v.fontFamily === "string") return v.fontFamily;
   if ("opacity" in v) return String(v.opacity);
   if ("zIndex" in v) return String(v.zIndex);
   if ("duration" in v) return `${v.duration}${v.unit}`;
   if ("easing" in v) return Array.isArray(v.easing) ? `cubic-bezier(${v.easing.join(", ")})` : v.easing;
-  if ("typography" in v) {
-    const t = v.typography;
-    const size = "dimension" in t.fontSize ? `${t.fontSize.dimension}${t.fontSize.unit}` : "—";
-    return `${t.fontFamily} ${size}/${t.lineHeight} ${t.fontWeight}`;
-  }
   if ("shadow" in v) return `${v.shadow.length} shadow layer(s)`;
   if ("border" in v) return `${v.border.style} border`;
   return "—";
@@ -142,6 +139,20 @@ export function buildAIContext(ds: DesignSystem, opts: BuildAIContextOptions = {
   const nameOf = new Map(ds.tokens.map((t) => [t.id, t.name]));
 
   const tokens: AITokenSummary[] = [...ds.tokens].sort(byName).map((t) => {
+    // typography styles resolve through their inheritance chain to a concrete style
+    if (t.type === "typography") {
+      const ty = resolveTypographyToken(ds, t.id);
+      const s = ty.style;
+      return {
+        name: t.name,
+        type: t.type,
+        tier: t.tier,
+        value: ty.ok
+          ? `${s.fontFamily} ${s.fontSize}/${s.lineHeight} ${s.fontWeight}`
+          : "unresolved",
+        ...(t.usage ? { usage: t.usage } : {}),
+      };
+    }
     const resolved = resolveTokenValue(ds, t.id);
     return {
       name: t.name,

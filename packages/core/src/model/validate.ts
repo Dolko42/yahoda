@@ -148,6 +148,70 @@ export function validateInvariants(ds: DesignSystem): ValidationReport {
         t.id,
       );
     }
+    // typography composites: extends must be an existing typography token,
+    // fontFamily ref a fontFamily token, fontSize ref a dimension token
+    if ("typography" in t.value) {
+      const ty = t.value.typography;
+      if (ty.extends) {
+        const parent = tokensById.get(ty.extends.$ref);
+        if (!parent) {
+          err("DANGLING_REF", `Token "${t.name}" extends missing token "${ty.extends.$ref}"`, t.id);
+        } else if (parent.type !== "typography") {
+          err(
+            "TYPE_MISMATCH",
+            `Token "${t.name}" extends "${parent.name}" (${parent.type}), expected typography`,
+            t.id,
+          );
+        }
+      }
+      if (ty.fontFamily && isRefValue(ty.fontFamily)) {
+        const font = tokensById.get(ty.fontFamily.$ref);
+        if (!font) {
+          err(
+            "DANGLING_REF",
+            `Token "${t.name}" fontFamily references missing token "${ty.fontFamily.$ref}"`,
+            t.id,
+          );
+        } else if (font.type !== "fontFamily") {
+          err(
+            "TYPE_MISMATCH",
+            `Token "${t.name}" fontFamily references "${font.name}" (${font.type}), expected fontFamily`,
+            t.id,
+          );
+        }
+      }
+      if (ty.fontSize && isRefValue(ty.fontSize)) {
+        const size = tokensById.get(ty.fontSize.$ref);
+        if (!size) {
+          err(
+            "DANGLING_REF",
+            `Token "${t.name}" fontSize references missing token "${ty.fontSize.$ref}"`,
+            t.id,
+          );
+        } else if (size.type !== "dimension") {
+          err(
+            "TYPE_MISMATCH",
+            `Token "${t.name}" fontSize references "${size.name}" (${size.type}), expected dimension`,
+            t.id,
+          );
+        }
+      }
+    }
+  }
+
+  // typography inheritance cycle detection (extends chain)
+  for (const t of ds.tokens) {
+    if (!("typography" in t.value)) continue;
+    const seen = new Set<string>();
+    let cur: Token | undefined = t;
+    while (cur && "typography" in cur.value && cur.value.typography.extends) {
+      if (seen.has(cur.id)) {
+        err("EXTENDS_CYCLE", `Token "${t.name}" is part of a typography inheritance cycle`, t.id);
+        break;
+      }
+      seen.add(cur.id);
+      cur = tokensById.get(cur.value.typography.extends.$ref);
+    }
   }
 
   // alias cycle detection (invariant 3)

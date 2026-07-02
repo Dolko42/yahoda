@@ -19,6 +19,7 @@ import { generateComponentCode, generateTokenCode } from "@/lib/code";
 import { EditRow, NumberField, SelectField, TextArea, TextField } from "./edit/Controls";
 import { TokenValueEditor } from "./edit/TokenValueEditor";
 import { ColorTokenExtras } from "./edit/ColorTokenExtras";
+import { TypographyTokenExtras } from "./edit/TypographyTokenExtras";
 import { AiRulesEditor } from "./edit/AiRulesEditor";
 import { DeleteTokenButton } from "./edit/DeleteTokenButton";
 import { RecipeEditor } from "./edit/RecipeEditor";
@@ -96,8 +97,14 @@ function PropertiesTab({ ds, sel }: { ds: DesignSystem; sel: ResolvedNode }) {
         <Field label="Type">{t.type}</Field>
         <Field label="Tier">{t.tier}</Field>
         {t.group && <Field label="Group">{t.group}</Field>}
-        <EditRow label="Value"><TokenValueEditor ds={ds} token={t} /></EditRow>
+        {/* typography/font tokens are edited field-by-field in their extras below */}
+        {t.type !== "typography" && t.type !== "fontFamily" && (
+          <EditRow label="Value"><TokenValueEditor ds={ds} token={t} /></EditRow>
+        )}
         {t.type === "color" && <ColorTokenExtras ds={ds} token={t} />}
+        {(t.type === "typography" || t.type === "fontFamily") && (
+          <TypographyTokenExtras ds={ds} token={t} />
+        )}
         <EditRow label="Usage">
           <TextField value={t.usage ?? ""} placeholder="When to use this token…"
             onCommit={(v) => patchToken(t.id, { usage: v })} />

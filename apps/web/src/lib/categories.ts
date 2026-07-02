@@ -43,9 +43,11 @@ export const CATEGORIES: Category[] = [
   { id: "colors", label: "Colors",
     creates: [{ type: "color", namePrefix: "color", group: "Brand", label: "Color" }],
     match: (t) => t.type === "color" },
+  // typography has a dedicated sidebar (TypographySidebar) that owns creation/grouping;
+  // `match` still powers anything generic that filters by category
   { id: "typography", label: "Typography",
-    creates: [{ type: "typography", namePrefix: "typography", group: "Typography", label: "Text style" }],
-    match: (t) => t.type === "typography" },
+    creates: [{ type: "typography", namePrefix: "typography", group: "Text Styles", label: "Text style" }],
+    match: (t) => t.type === "typography" || t.type === "fontFamily" },
   { id: "spacing", label: "Spacing",
     creates: [{ type: "dimension", namePrefix: "spacing", group: "Spacing", label: "Spacing" }],
     match: (t) => t.type === "dimension" && !t.name.startsWith("radius") },

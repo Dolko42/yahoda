@@ -13,6 +13,8 @@ export function defaultTokenValue(type: TokenType): TokenValue {
       return { color: "#3B82F6" };
     case "dimension":
       return { dimension: 8, unit: "px" };
+    case "fontFamily":
+      return { fontFamily: '"Inter", system-ui, sans-serif' };
     case "typography":
       return {
         typography: {
@@ -56,6 +58,8 @@ export function defaultNamePrefix(type: TokenType): string {
       return "color";
     case "dimension":
       return "spacing";
+    case "fontFamily":
+      return "font";
     case "typography":
       return "typography";
     case "shadow":
@@ -135,6 +139,69 @@ export function makeSemanticColor(opts: {
     tier: "semantic",
     group: "Brand",
     value: opts.sourceId ? { $ref: opts.sourceId } : { color: opts.hex ?? "#3B82F6" },
+  });
+}
+
+// --- typography makers -------------------------------------------------------
+
+/** Prefix used for font family tokens (matches the seed convention, e.g. `font.heading`). */
+export const FONT_PREFIX = "font";
+/** Prefix used for typography styles, e.g. `typography.heading.lg`. */
+export const TYPOGRAPHY_PREFIX = "typography";
+
+export function fontFamilyName(role: string): string {
+  return `${FONT_PREFIX}.${role.trim().toLowerCase()}`;
+}
+
+export function typographyStyleName(path: string): string {
+  return `${TYPOGRAPHY_PREFIX}.${path.trim()}`;
+}
+
+/** Build a font family token (holds the actual font stack). */
+export function makeFontFamilyToken(opts: { role: string; stack: string }): Token {
+  return makeToken({
+    type: "fontFamily",
+    name: fontFamilyName(opts.role),
+    tier: "primitive",
+    group: "Font Families",
+    value: { fontFamily: opts.stack.trim() || '"Inter", system-ui, sans-serif' },
+  });
+}
+
+/** Build a base typography style (primitive tier, shared defaults) bound to a font. */
+export function makeBaseTypographyStyle(opts: { role: string; fontTokenId?: string }): Token {
+  return makeToken({
+    type: "typography",
+    name: typographyStyleName(`${opts.role.trim()}.base`),
+    tier: "primitive",
+    group: "Base Styles",
+    value: {
+      typography: {
+        ...(opts.fontTokenId ? { fontFamily: { $ref: opts.fontTokenId } } : {}),
+        fontWeight: 400,
+        lineHeight: 1.5,
+      },
+    },
+  });
+}
+
+/** Build a semantic text style that inherits a base style and sets its size. */
+export function makeSemanticTypographyStyle(opts: {
+  path: string;
+  parentTokenId?: string;
+  fontSizeRem?: number;
+}): Token {
+  return makeToken({
+    type: "typography",
+    name: typographyStyleName(opts.path),
+    tier: "semantic",
+    group: "Text Styles",
+    value: {
+      typography: {
+        ...(opts.parentTokenId ? { extends: { $ref: opts.parentTokenId } } : {}),
+        fontSize: { dimension: opts.fontSizeRem ?? 1, unit: "rem" },
+      },
+    },
   });
 }
 
